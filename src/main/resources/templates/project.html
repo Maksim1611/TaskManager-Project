@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/tasks.css">
+    <link rel="stylesheet" href="/css/task-badges.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/project.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">TaskFlow</h1>
+        </div>
+
+        <nav class="nav">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="/projects" class="nav-link active">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="/tasks" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </a>
+            <a href="/activity" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                Activity
+            </a>
+            <a href="/analytics" class="nav-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                Analytics
+            </a>
+            <a href="/notifications" class="nav-link">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/users" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    Users
+                </a>
+            </div>
+            <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+                <a href="/notifications/sender" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    Alerts
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-profile">
+            <img th:if="${base64Image != null}"
+                 th:src="'data:image/png;base64,' + ${base64Image}"
+                 class="user-avatar"
+                 alt="User Avatar">
+
+            <div th:if="${base64Image == null}"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                 class="user-avatar">MS
+            </div>
+
+            <div class="user-info">
+                <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+                <div th:text="${user.email}" class="email"></div>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title" th:text="${project.title}">Website Redesign</h1>
+                <p class="subtitle">Project details and information</p>
+            </div>
+            <div class="header-right">
+                <a href="/projects" class="back-btn-large">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Projects
+                </a>
+                <a th:href="@{'/projects/' + ${project.id} + '/project'}" class="btn btn-secondary">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </a>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="project-header-card">
+                <div class="project-header-content">
+                    <div class="project-icon-large purple">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="project-header-info">
+                        <div class="project-title-row">
+                            <h2 th:text="${project.title}">Website Redesign</h2>
+                            <span th:if="${project.status.name == 'ACTIVE'}" class="status-badge status-active">
+                                <i class="fas fa-circle"></i> Active
+                            </span>
+                            <span th:if="${project.status.name == 'IN_PROGRESS'}"
+                                  class="status-badge status-in-progress">
+                                <i class="fas fa-circle"></i> In Progress
+                            </span>
+                            <span th:if="${project.status.name == 'ON_HOLD'}" class="status-badge status-onhold">
+                                <i class="fas fa-circle"></i> On Hold
+                            </span>
+                            <span th:if="${project.status.name == 'COMPLETED'}" class="status-badge status-completed">
+                                <i class="fas fa-circle"></i> Completed
+                            </span>
+                        </div>
+                        <p class="project-description" th:text="${project.description}">
+                            Complete overhaul of company website with modern design, improved UX, and mobile
+                            responsiveness.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-wrapper">
+                        <div class="progress-content">
+                            <div class="progress-header">
+                                <span class="progress-label">Progress</span>
+                                <span class="progress-percentage" th:text="${project.completionPercent != 0 ? project.completionPercent : 0} + '%'">65%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" th:style="|width: ${project.completionPercent != 0 ? project.completionPercent : 0}%|"></div>
+                            </div>
+                        </div>
+                        <form th:if="${project.status.name != 'COMPLETED'}" th:action="@{'/projects/' + ${project.id} + '/project'}" method="post" style="margin: 0;">
+                            <input type="hidden" name="_method" value="patch"/>
+                            <button type="submit" class="btn-complete-project">
+                                <i class="fas fa-check-circle"></i>
+                                Complete Project
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-grid">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="info-icon purple">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3>Information</h3>
+                    </div>
+                    <div class="info-list">
+                        <div class="info-row">
+                            <div class="info-icon-small purple">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">CREATION DATE</div>
+                                <div class="info-value"
+                                     th:text="${project.createdOn != null ? #temporals.format(project.createdOn, 'dd MMM yyyy') : 'N/A'}">
+                                    16 Nov 2025
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon-small purple">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">DUE DATE</div>
+                                <div class="info-value"
+                                     th:text="${project.dueDate != null ? #temporals.format(project.dueDate, 'dd MMM yyyy') : 'N/A'}">
+                                    16 Nov 2025
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon-small purple">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">CREATED BY</div>
+                                <div class="info-value"
+                                     th:text="${project.user != null ? project.user.firstName + ' ' + project.user.lastName : 'N/A'}">
+                                    Maxi Stefanov
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon-small purple">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">TOTAL TASKS</div>
+                                <div class="info-value" th:text="${project.tasks != null ? project.tasks.size() : 0}">
+                                    0
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon-small purple">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">MEMBERS</div>
+                                <div class="info-value">
+                                    <span th:if="${project.members == null or project.members.isEmpty()}"
+                                          class="no-members">No members</span>
+                                    <span th:unless="${project.members == null or project.members.isEmpty()}"
+                                          th:text="${members}" class="no-members">No members</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tasks-section-full">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-tasks"></i>
+                            Tasks
+                            <span class="task-count-badge"
+                                  th:text="${project.tasks != null ? project.tasks.size() : 0}">0</span>
+                        </h2>
+                        <a th:href="@{'/tasks/new-task/' + ${project.id}}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Add Task
+                        </a>
+                    </div>
+
+                    <div th:if="${tasks != null and !tasks.isEmpty()}" class="tasks-list">
+                        <div th:each="task : ${tasks}">
+                            <div th:if="${task.status.name() != 'COMPLETED'}" class="task-row">
+                                <div class="task-left">
+                                    <form th:action="@{/tasks/{id}/status(id=${task.id})}" method="post">
+                                        <input type="hidden" name="_method" value="patch"/>
+                                        <input type="hidden" name="status"
+                                               th:value="${task.status.name() == 'TODO' ? 'IN_PROGRESS' : 'TODO'}"/>
+                                        <label>
+                                            <input type="checkbox" class="task-check"
+                                                   th:checked="${task.status.name() == 'IN_PROGRESS'}"
+                                                   onchange="this.form.submit()">
+                                        </label>
+                                    </form>
+                                    <div class="task-content">
+                                        <h3 th:text="${task.getTitle()}" class="task-name">Design homepage mockup</h3>
+                                        <p th:text="${task.getDescription()}" class="task-desc">
+                                            Create an initial layout for the homepage design based on the wireframe.
+                                        </p>
+                                        <div class="task-info">
+                                            <span th:if="${task.priority.name() == 'LOW'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge low">LOW PRIORITY</span>
+                                            <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge medium">MEDIUM PRIORITY</span>
+                                            <span th:if="${task.priority.name() == 'HIGH'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge high">HIGH PRIORITY</span>
+                                            <span th:if="${task.status.name() == 'OVERDUE'}" th:text="'Overdue'"
+                                                  class="task-status overdue">Overdue</span>
+                                            <span th:if="${task.status.name() == 'TODO'}" th:text="'TODO'"
+                                                  class="task-status todo">TODO</span>
+                                            <span th:if="${task.status.name() == 'IN_PROGRESS'}" th:text="'In progress'"
+                                                  class="task-status progress">In progress</span>
+                                            <span th:if="${task.dueDate != null}"
+                                                  th:text="${#temporals.format(task.getDueDate(), 'yyyy-MM-dd HH:mm')}"
+                                                  class="task-date">2025-10-20</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="task-actions">
+                                    <a th:href="'/tasks/' + ${task.id} + '/task'">
+                                        <button class="btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                                    </a>
+                                    <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
+                                        <input type="hidden" name="_method" value="delete"/>
+                                        <button class="btn-delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                    <form th:action="@{'/tasks/' + ${task.id} + '/task'}" th:method="PATCH">
+                                        <button class="btn-complete" title="Complete"><i
+                                                class="fas fa-check-square"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div th:if="${task.status.name() == 'COMPLETED'}" class="task-row completed">
+                                <div class="task-left">
+                                    <input type="checkbox" class="task-check" checked disabled>
+                                    <div class="task-content">
+                                        <h3 th:text="${task.title}" class="task-name">Setup CI/CD pipeline</h3>
+                                        <p th:text="${task.getDescription()}" class="task-desc"></p>
+                                        <div class="task-info">
+                                            <span th:if="${task.priority.name() == 'LOW'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge low">Low</span>
+                                            <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge medium">Medium</span>
+                                            <span th:if="${task.priority.name() == 'HIGH'}"
+                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                                  class="task-badge high">High</span>
+                                            <span class="task-badge done">Completed</span>
+                                            <span th:text="'Completed: ' + ${#temporals.format(task.completedOn, 'yyyy MMM dd HH:MM')}"
+                                                  class="task-date">Completed: Dec 8</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="task-actions">
+                                    <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
+                                        <input type="hidden" name="_method" value="delete"/>
+                                        <button class="btn-delete" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="empty-state" th:if="${project.tasks == null or project.tasks.isEmpty()}">
+                        <div class="empty-illustration">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>No Tasks Yet</h3>
+                        <p>Create your first task to get started with this project.</p>
+                        <a th:href="@{'/tasks/new-task/' + ${project.id}}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Add Task
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

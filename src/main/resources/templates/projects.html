@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - TaskFlow</title>
+    <link rel="stylesheet" href="/css/projects.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">TaskFlow</h1>
+        </div>
+
+        <nav class="nav">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="/projects" class="nav-link active">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="/tasks" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </a>
+            <a href="/activity" class="nav-link">
+                <i class="fa-solid fa-chart-line"></i>
+                Activity
+            </a>
+            <a href="/analytics" class="nav-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                Analytics
+            </a>
+            <a href="/notifications" class="nav-link">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/users" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    Users
+                </a>
+            </div>
+            <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+                <a href="/notifications/sender" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    Alerts
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-profile">
+            <img th:if="${base64Image != null}"
+                 th:src="'data:image/png;base64,' + ${base64Image}"
+                 class="user-avatar"
+                 alt="User Avatar">
+
+            <div th:if="${base64Image == null}"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                 class="user-avatar">MS
+            </div>
+
+            <div class="user-info">
+                <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+                <div th:text="${user.email}" class="email"></div>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">Projects</h1>
+                <p class="subtitle">Manage and organize your projects</p>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">1</span>
+                </button>
+                <a href="/projects/new-project" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    New Project
+                </a>
+            </div>
+        </header>
+
+        <div class="content">
+            <section class="stats-grid">
+                <a class="stat-card-link" href="/projects">
+                    <div class="stat-card purple">
+                        <div class="stat-icon purple"><i class="fas fa-layer-group"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${user.projects.size()}">0</div>
+                            <div class="stat-label">Total Projects</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="stat-card-link" th:href="@{/projects(status='ACTIVE')}">
+                    <div class="stat-card green">
+                        <div class="stat-icon green"><i class="fas fa-play"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${activeProjects.size()}">0</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="stat-card-link" th:href="@{/projects(status='IN_PROGRESS')}">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${inProgressProjects.size()}">0</div>
+                            <div class="stat-label">In Progress</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="stat-card-link" th:href="@{/projects(status='COMPLETED')}">
+                    <div class="stat-card teal">
+                        <div class="stat-icon teal"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" th:text="${completedProjects.size()}">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                    </div>
+                </a>
+            </section>
+
+            <div class="projects">
+                <div class="section-header">
+                    <h2>My Projects</h2>
+                    <span th:text="${projects.size()} + ' Projects'" class="count">0 Projects</span>
+                </div>
+
+                <div class="projects-grid" th:if="${!projects.isEmpty()}">
+                    <div th:each="project : ${projects}" class="project-card">
+                        <div class="project-header">
+                            <div class="project-icon purple">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div th:if="${project.projectVisibility.name() == 'PUBLIC'}"
+                                 class="project-visibility public">
+                                <i class="fas fa-globe"></i> Public
+                            </div>
+                            <div th:if="${project.projectVisibility.name() == 'PRIVATE'}"
+                                 class="project-visibility private">
+                                <i class="fa-solid fa-lock"></i> Private
+                            </div>
+                            <div class="project-info">
+                                <h3 th:text="${project.title}">Website Redesign</h3>
+                                <p class="project-description" th:text="${project.description}">Complete overhaul of
+                                    company website with modern design and improved UX.</p>
+                            </div>
+                        </div>
+
+                        <div class="project-tags" th:if="${project.tags != null and !project.tags.isEmpty()}">
+                            <span th:each="tag : ${project.tags}" class="tag" th:text="${tag.title}">Design</span>
+                        </div>
+
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tasks"></i>
+                                <span th:text="${project.tasks.size()} + ' tasks'">12 tasks</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span th:text="${project.dueDate != null ? #temporals.format(project.dueDate, 'dd MMM yyyy') : 'N/A'}">15 Dec 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="progress">
+                            <div class="progress-bar">
+                                <div th:if="${project.completionPercent >= 0}" class="progress-fill"
+                                     th:style="|width: ${project.completionPercent ?: 0}%|"></div>
+                            </div>
+                            <span class="progress-text" th:text="${(project.completionPercent ?: 0)} + '%'">0%</span>
+                        </div>
+
+                        <div class="project-status-row">
+                            <span th:if="${project.status.name == 'ACTIVE'}" th:text="${project.status.displayName}"
+                                  class="status active">
+                                <i class="fas fa-circle"></i> Active
+                            </span>
+                            <span th:if="${project.status.name == 'IN_PROGRESS'}"
+                                  th:text="${project.status.displayName}" class="status in-progress">
+                                <i class="fas fa-circle"></i> In Progress
+                            </span>
+                            <span th:if="${project.status.name == 'ON_HOLD'}" th:text="${project.status.displayName}"
+                                  class="status onhold">
+                                <i class="fas fa-circle"></i> On Hold
+                            </span>
+                            <span th:if="${project.status.name == 'COMPLETED'}" th:text="${project.status.displayName}"
+                                  class="status completed">
+                                <i class="fas fa-circle"></i> Completed
+                            </span>
+                            <span th:if="${project.status.name == 'OVERDUE'}" th:text="${project.status.displayName}"
+                                  class="status overdue">
+                                <i class="fas fa-circle"></i> Completed
+                            </span>
+                        </div>
+
+                        <div class="project-actions">
+                            <a th:href="@{'/projects/' + ${project.id} + '/project'}">
+                                <button  class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                            </a>
+                            <a th:href="@{'/projects/' + ${project.id}}" class="action-btn" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <form th:action="@{'/projects/' + ${project.id} + '/project'}" th:method="POST">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button class="action-btn" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${projects.isEmpty()}">
+                    <div class="empty-illustration">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div th:if="${status != null}">
+                        <h3 th:text="'No ' + ${status.toLowerCase().replaceAll('_', ' ')} +' projects yet'">No projects
+                            yet</h3>
+                        <p></p>
+                        <a href="/projects" class="btn btn-primary">
+                            <i class="fas fa-arrow fa-align-left"></i>
+                            Back to Projects
+                        </a>
+                    </div>
+                    <div th:if="${status == null}">
+                        <h3>No Projects yet</h3>
+                        <p>Create your first project to get started organizing your work.</p>
+                        <a href="/projects/new-project" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            New Project
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

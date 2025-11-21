@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/users.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h1 class="logo">TaskFlow</h1>
+    </div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-link">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/projects" class="nav-link ">
+            <i class="fas fa-folder"></i>
+            Projects
+        </a>
+        <a href="/tasks" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            Tasks
+        </a>
+        <a href="/activity" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Activity
+        </a>
+        <a href="/analytics" class="nav-link">
+            <i class="fa-solid fa-chart-simple"></i>
+            Analytics
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <div sec:authorize="hasRole('ADMIN')" >
+            <a href="/users" class="nav-link">
+                <i class="fa-solid fa-user"></i>
+                Users
+            </a>
+        </div>
+        <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+            <a href="/notifications/sender" class="nav-link">
+                <i class="fa-solid fa-bullhorn"></i>
+                Alerts
+            </a>
+        </div>
+    </nav>
+
+    <div class="user-profile">
+        <img th:if="${base64Image != null}"
+             th:src="'data:image/png;base64,' + ${base64Image}"
+             class="user-avatar"
+             alt="User Avatar">
+
+        <div th:if="${base64Image == null}"
+             th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+             class="user-avatar">MS</div>
+
+        <div class="user-info">
+            <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+            <div th:text="${user.email}" class="email"></div>
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main-content">
+
+    <header class="top-bar">
+        <div class="top-bar-left">
+        </div>
+            <button class="search-btn">🔍</button>
+    </header>
+
+    <div class="content-wrapper">
+
+        <header class="users-header">
+            <div class="header-left">
+                <h1>Team Directory</h1>
+                <p>Manage roles, access levels, and account status for every teammate.</p>
+            </div>
+            <div class="users-meta">
+                <span class="meta-pill">
+                    <i class="fas fa-users"></i>
+                    <span th:text="${users != null ? users.size() : 0}">0</span> Users
+                </span>
+                <span class="meta-pill">
+                    <i class="fas fa-user-shield"></i>
+                    Admin Access
+                </span>
+            </div>
+        </header>
+
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}" class="user-row">
+                    <td>
+                        <span th:text="${user.id}" class="username-text">mazistaf</span>
+                    </td>
+                    <td>
+                        <span th:text="${user.username}" class="username-text">mazistaf</span>
+                    </td>
+
+                    <td>
+                        <span th:text="${user.email}" class="email-text">stafanovmazi@gmail.com</span>
+                    </td>
+                    <td>
+                        <span th:if="${user.role.name == 'ADMIN'}" th:text="Admin" class="role-badge admin">Admin</span>
+                        <span th:if="${user.role.name == 'USER'}" th:text="User" class="role-badge user">User</span>
+                        <span th:if="${user.role.name == 'MODERATOR'}" th:text="Moderator" class="role-badge moderator">Moderator</span>
+                    </td>
+                    <td>
+                        <span th:if="${user.active}" th:text="Active" class="status-badge active">Active</span>
+                        <span th:if="${!user.active}" th:text="Inactive" class="status-badge inactive">Inactive</span>
+                    </td>
+                    <td>
+                        <span class="date-text">Oct 15, 2024</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <form th:action="@{'/users/' + ${user.id} + '/role'}" th:method="PATCH">
+                                <button type="submit" class="action-btn switch-role" title="Switch Role">
+                                    <i class="fas fa-arrows-rotate"></i>
+                                    Switch Role
+                                </button>
+                            </form>
+                            <form th:action="@{'/users/' + ${user.id} + '/status'}" th:method="PATCH">
+                                <button type="submit" class="action-btn switch-status" title="Switch Status">
+                                    <i class="fas fa-toggle-on"></i>
+                                    Switch Status
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Not Found</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(135deg, #eef2f7, #dfe6f1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 55px 65px;
+            border-radius: 22px;
+            text-align: center;
+            width: 500px;
+
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow:
+                    0 8px 25px rgba(0,0,0,0.07),
+                    inset 0 0 10px rgba(0,0,0,0.02);
+        }
+
+        .icon {
+            font-size: 60px;
+            color: #f4b400;
+            margin-bottom: 15px;
+        }
+
+        .code {
+            font-size: 90px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 0;
+        }
+
+        .accent-line {
+            width: 70px;
+            height: 4px;
+            background: #4c8bf5;
+            margin: 18px auto 28px auto;
+            border-radius: 4px;
+        }
+
+        .message {
+            font-size: 25px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .details {
+            font-size: 17px;
+            color: #667085;
+            line-height: 1.7;
+            margin-bottom: 35px;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 34px;
+            background: #4c8bf5;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #3a73d9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="icon">⚠️</div>
+    <div class="code">404</div>
+    <div class="accent-line"></div>
+
+    <div class="message">Page Not Found</div>
+    <div class="details">
+        The page you're looking for doesn't exist or may have been moved.
+        Please check the URL or return to the homepage.
+    </div>
+
+    <a href="/dashboard" class="btn">Back to Home</a>
+</div>
+
+</body>
+</html>

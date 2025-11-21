@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/tasks.css">
+    <link rel="stylesheet" href="/css/task-badges.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h1 class="logo">TaskFlow</h1>
+    </div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-link">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/projects" class="nav-link ">
+            <i class="fas fa-folder"></i>
+            Projects
+        </a>
+        <a href="/tasks" class="nav-link active">
+            <i class="fas fa-tasks"></i>
+            Tasks
+        </a>
+        <a href="/activity" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Activity
+        </a>
+        <a href="/analytics" class="nav-link">
+            <i class="fa-solid fa-chart-simple"></i>
+            Analytics
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a href="/users" class="nav-link">
+                <i class="fa-solid fa-user"></i>
+                Users
+            </a>
+        </div>
+        <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+            <a href="/notifications/sender" class="nav-link">
+                <i class="fa-solid fa-bullhorn"></i>
+                Alerts
+            </a>
+        </div>
+    </nav>
+
+    <div class="user-profile">
+        <img th:if="${base64Image != null}"
+             th:src="'data:image/png;base64,' + ${base64Image}"
+             class="user-avatar"
+             alt="User Avatar">
+
+        <div th:if="${base64Image == null}"
+             th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+             class="user-avatar">MS
+        </div>
+
+        <div class="user-info">
+            <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+            <div th:text="${user.email}" class="email"></div>
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <header class="header">
+        <div class="header-left">
+            <h1 class="title">Tasks</h1>
+            <p class="subtitle">Manage and organize your tasks</p>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="badge">1</span>
+            </button>
+            <a th:href="@{tasks/new-task}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                New Task
+            </a>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <div class="content-area">
+            <div class="stats-grid">
+                <div class="stat-box stat-purple">
+                    <div class="stat-icon-box">📋</div>
+                    <div class="stat-details">
+                        <div th:text="${tasks.size()}" class="stat-number">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                </div>
+
+                <div class="stat-box stat-green">
+                    <div class="stat-icon-box">✓</div>
+                    <div class="stat-details">
+                        <div th:text="${countCompletedTasks}" class="stat-number">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+
+                <div class="stat-box stat-orange">
+                    <div class="stat-icon-box">⏳</div>
+                    <div class="stat-details">
+                        <div th:text="${countInProgressTasks}" class="stat-number">0</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+
+                <div class="stat-box stat-blue">
+                    <div class="stat-icon-box">📊</div>
+                    <div class="stat-details">
+                        <div th:text="${countTodoTasks}" class="stat-number">85%</div>
+                        <div class="stat-label">To do </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+
+                <div class="tasks-section">
+                    <div class="section-header">
+                        <h2>Recent Tasks</h2>
+                        <a th:href="@{tasks}" class="view-all-link">View All</a>
+                    </div>
+
+                    <div th:each="task : ${tasks}" class="tasks-list">
+
+                        <div th:if="${task.status.name() != 'COMPLETED'}" class="task-row">
+                            <div class="task-left">
+                                <form th:action="@{/tasks/{id}/status(id=${task.id})}" method="post">
+                                    <input type="hidden" name="_method" value="patch"/>
+                                    <input type="hidden" name="status"
+                                           th:value="${task.status.name() == 'TODO' ? 'IN_PROGRESS' : 'TODO'}"/>
+                                    <label>
+                                        <input type="checkbox" class="task-check"
+                                               th:checked="${task.status.name() == 'IN_PROGRESS'}"
+                                               onchange="this.form.submit()">
+                                    </label>
+                                </form>
+                                <div class="task-content">
+                                    <h3 th:text="${task.getTitle()}" class="task-name">Design homepage mockup</h3>
+                                    <p th:text="${task.getDescription()}" class="task-desc">
+                                        Create an initial layout for the homepage design based on the wireframe.
+                                    </p>
+                                    <div class="task-info">
+                                        <span th:if="${task.priority.name() == 'LOW'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge low">HIGH PRIORITY</span>
+                                        <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge medium">High</span>
+                                        <span th:if="${task.priority.name() == 'HIGH'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge high">High</span>
+                                        <span th:if="${task.status.name() == 'OVERDUE'}" th:text="'Overdue'"
+                                              class="task-status overdue">On Hold</span>
+                                        <span th:if="${task.status.name() == 'TODO'}" th:text="'TODO'"
+                                              class="task-status todo">On Hold</span>
+                                        <span th:if="${task.status.name() == 'IN_PROGRESS'}" th:text="'In progress'"
+                                              class="task-status progress">On Hold</span>
+                                        <span th:text="${#temporals.format(task.getDueDate(), 'yyyy-MM-dd HH:mm')}"
+                                              class="task-date">2025-10-20</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="task-actions">
+                                <a th:href="'/tasks/' + ${task.id} + '/task'">
+                                    <button  class="btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                                </a>
+                                <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
+                                    <input type="hidden" name="_method" value="delete"/>
+                                    <button class="btn-delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+
+                                <form th:action="@{'/tasks/' + ${task.id} + '/task'}" th:method="PATCH">
+                                    <button class="btn-complete" title="Complete"><i class="fas fa-check-square"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+
+
+                        </div>
+
+                        <div th:if="${task.status.name() == 'COMPLETED'}" class="task-row completed">
+                            <input type="checkbox" class="task-check" checked>
+                            <div class="task-content">
+                                <h3 th:text="${task.title}" class="task-name">Setup CI/CD pipeline</h3>
+                                <p th:text="${task.getDescription()}" class="task-desc">
+                                <div class="task-info">
+                                    <span th:if="${task.priority.name() == 'LOW'}"
+                                          th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                          class="task-badge low">Low</span>
+                                    <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                          th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                          class="task-badge medium">Medium</span>
+                                    <span th:if="${task.priority.name() == 'HIGH'}"
+                                          th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                          class="task-badge high">High</span>
+                                    <span class="task-badge done">Completed</span>
+                                    <span th:if="${task.project == null}" th:text="'No project'" class="task-project">DevOps</span>
+                                    <span th:if="${task.project != null}" th:text="${task.project.title}"
+                                          class="task-project">DevOps</span>
+                                    <span th:text="'Completed: ' + ${#temporals.format(task.completedOn, 'yyyy MMM dd HH:MM')}"
+                                          class="task-date">Completed: Dec 8</span>
+                                </div>
+                            </div>
+
+                            <div th:if="${task.status.name() == 'COMPLETED'}" class="task-actions">
+                                <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
+                                    <input type="hidden" name="_method" value="delete"/>
+                                    <button class="btn-delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="empty-state" th:if="${tasks.isEmpty()}">
+                        <div class="empty-illustration">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3>No Tasks yet</h3>
+                        <p>Create your first task to get started organizing your work.</p>
+                        <a href="/tasks/new-task" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            New Task
+                        </a>
+                    </div>
+                </div>
+                <div class="right-sidebar">
+
+                    <div class="widget">
+                        <h3 class="widget-title">Progress Overview</h3>
+
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <span>Completed Tasks</span>
+                                <span th:text="${(completedTasksPercentage ?: 0)} + '%'"
+                                      class="progress-percent">75%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"
+                                     th:style="|width: ${completedTasksPercentage ?: 0}%|"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <span>In Progress tasks</span>
+                                <span th:text="${(inProgressTasksPercentage ?: 0)} + '%'"
+                                      class="progress-percent">25%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill progress-orange"
+                                     th:style="|width: ${inProgressTasksPercentage ?: 0}%|"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-info">
+                                <span>Overdue tasks</span>
+                                <span th:text="${(overdueTasksPercentage ?: 0)} + '%'"
+                                        class="progress-percent">60%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill progress-red"
+                                     th:style="|width: ${overdueTasksPercentage ?: 0}%|"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget">
+                        <h3 class="widget-title">Recent Activity</h3>
+
+                        <div th:each="activity : ${recentActivity}" class="activity-item">
+                            <div th:if="${activity.type.name() == 'TASK_CREATED'}" class="activity-icon blue">+</div>
+                            <div th:if="${activity.type.name() == 'TASK_DELETED'}" class="activity-icon red">🗑️</div>
+                            <div th:if="${activity.type.name() == 'TASK_UPDATED'}" class="activity-icon orange">📝</div>
+                            <div th:if="${activity.type.name() == 'TASK_COMPLETED'}" class="activity-icon green">✓</div>
+                            <div class="activity-text">
+                                <p th:text="${activity.message}">Completed "Team meeting preparation"</p>
+                                <span th:text="${activity.dateOutput}">2 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

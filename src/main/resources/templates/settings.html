@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h1 class="logo">TaskFlow</h1>
+    </div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-link">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/projects" class="nav-link ">
+            <i class="fas fa-folder"></i>
+            Projects
+        </a>
+        <a href="/tasks" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            Tasks
+        </a>
+        <a href="/activity" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Activity
+        </a>
+        <a href="/analytics" class="nav-link">
+            <i class="fa-solid fa-chart-simple"></i>
+            Analytics
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link active">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a href="/users" class="nav-link">
+                <i class="fa-solid fa-user"></i>
+                Users
+            </a>
+        </div>
+        <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+            <a href="/notifications/sender" class="nav-link">
+                <i class="fa-solid fa-bullhorn"></i>
+                Alerts
+            </a>
+        </div>
+    </nav>
+
+    <div class="user-profile">
+        <img th:if="${base64Image != null}"
+             th:src="'data:image/png;base64,' + ${base64Image}"
+             class="user-avatar"
+             alt="User Avatar">
+
+        <div th:if="${base64Image == null}"
+             th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+             class="user-avatar">MS
+        </div>
+
+        <div class="user-info">
+            <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+            <div th:text="${user.email}" class="email"></div>
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="content-wrapper">
+        <div class="settings-container">
+
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2>Profile Information</h2>
+                    <p class="section-desc">Update your personal details and profile picture</p>
+                </div>
+
+                <div class="settings-card">
+                    <form th:action="@{'/users/' + ${user.id} + '/profile'}"
+                          method="post"
+                          th:object="${editProfileRequest}"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" name="_method" value="put"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" id="removeImage" name="removeImage" value="false"/>
+
+                        <div class="profile-photo-section">
+
+                            <div class="profile-photo-wrapper">
+                                <img th:if="${base64Image != null}"
+                                     th:src="'data:image/png;base64,' + ${base64Image}"
+                                     alt="Profile Photo"
+                                     id="profile-preview"
+                                     class="profile-photo">
+
+                                <div id="initials-avatar"
+                                     th:if="${user.image == null or user.image.length == 0}"
+                                     th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                                     class="profile-photo">
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div class="photo-actions">
+                                    <label for="profile-upload" class="btn btn-secondary custom-upload-label">
+                                        Choose Photo
+                                    </label>
+                                    <input type="file" id="profile-upload" name="image"
+                                           accept="image/png,image/jpeg" style="display:none;">
+
+                                    <button type="button" class="btn btn-text" id="remove-photo">Remove</button>
+                                </div>
+
+                                <div class="profile-photo-info">
+                                    <h3>Profile Photo</h3>
+                                    <p>JPG, PNG or GIF. Max size 2MB</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" th:field="*{username}" placeholder="Enter username">
+                            </div>
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" th:field="*{firstName}"
+                                       placeholder="Enter first name">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" th:field="*{lastName}" placeholder="Enter last name">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" th:field="*{email}" placeholder="Enter email">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2>Change Password</h2>
+                    <p class="section-desc">Update your password to keep your account secure</p>
+                </div>
+
+                <div class="settings-card" th:classappend="${user.password == null or user.password.isEmpty()} ? 'google-user-card'">
+                    <div th:if="${user.password == null or user.password == 'OAUTH2_USER'}" class="google-user-message">
+                        <div class="google-icon">
+                            <i class="fab fa-google"></i>
+                        </div>
+                        <h3>Google users cannot change passwords</h3>
+                        <p>Your account is managed through Google. To change your password, please update it in your Google account settings.</p>
+                    </div>
+
+                    <form th:if="${user.password != null and user.password != 'OAUTH2_USER'}"
+                          th:action="@{'/users/' + ${user.getId()} + '/password'}" th:method="PUT"
+                          th:object="${changePasswordRequest}">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="currentPassword">Current Password</label>
+                                <input th:field="*{currentPassword}" type="password" id="currentPassword"
+                                       placeholder="Enter current password" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input th:field="*{newPassword}" type="password" id="newPassword"
+                                       placeholder="Enter new password" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password</label>
+                                <input th:field="*{confirmPassword}" type="password" id="confirmPassword"
+                                       placeholder="Confirm new password" required>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2>Danger Zone</h2>
+                    <p class="section-desc">Irreversible actions for your account</p>
+                </div>
+
+                <div class="settings-card danger-card">
+
+                    <form th:action="@{'/users/' + ${user.getId()} + '/profile'}" th:method="DELETE">
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h3>Delete Account</h3>
+                                <p>Permanently delete your account and all associated data.</p>
+                            </div>
+                            <button type="submit" class="btn btn-danger">Delete Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+<script>
+    document.getElementById("profile-upload").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById("profile-preview");
+                const initials = document.getElementById("initials-avatar");
+
+                if (!img) {
+                    const newImg = document.createElement("img");
+                    newImg.id = "profile-preview";
+                    newImg.className = "profile-photo";
+                    newImg.alt = "Profile Photo";
+                    initials.parentNode.insertBefore(newImg, initials);
+                }
+
+                if (initials) initials.style.display = "none";
+
+                const preview = document.getElementById("profile-preview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+<script>
+    const fileInput = document.getElementById('profile-upload');
+    const preview = document.getElementById('profile-preview');
+    const initials = document.getElementById('initials-avatar');
+    const removeFlag = document.getElementById('removeImage');
+
+    fileInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                if (initials) initials.style.display = 'none';
+                removeFlag.value = 'false';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('remove-photo').addEventListener('click', function () {
+        preview.style.display = 'none';
+        if (initials) initials.style.display = 'flex';
+        fileInput.value = '';
+        removeFlag.value = 'true';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/analytics.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="sidebar-layout">
+<aside class="sidebar" xmlns:sec="http://www.w3.org/1999/xhtml">
+    <div class="sidebar-header">
+        <h1 class="logo">TaskFlow</h1>
+    </div>
+    <nav class="nav">
+        <a href="/dashboard" class="nav-link">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/projects" class="nav-link">
+            <i class="fas fa-folder"></i>
+            Projects
+        </a>
+        <a href="/tasks" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            Tasks
+        </a>
+        <a href="/activity" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Activity
+        </a>
+        <a href="/analytics" class="nav-link active">
+            <i class="fa-solid fa-chart-simple"></i>
+            Analytics
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <div sec:authorize="hasRole('ADMIN')" >
+            <a href="/users" class="nav-link">
+                <i class="fa-solid fa-user"></i>
+                Users
+            </a>
+        </div>
+        <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+            <a href="/notifications" class="nav-link">
+                <i class="fa-solid fa-bullhorn"></i>
+                Alerts
+            </a>
+        </div>
+    </nav>
+
+    <div class="user-profile">
+        <img th:if="${base64Image != null}"
+             th:src="'data:image/png;base64,' + ${base64Image}"
+             class="user-avatar"
+             alt="User Avatar">
+
+        <div th:if="${base64Image == null}"
+             th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+             class="user-avatar">MS</div>
+
+        <div class="user-info">
+            <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+            <div th:text="${user.email}" class="email"></div>
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <header class="header">
+        <div class="header-left">
+            <h1 class="title">Analytics</h1>
+            <p class="subtitle">Insights into your productivity and performance</p>
+        </div>
+        <div class="header-right">
+            <a href="/analytics/lifetime" class="btn-lifetime-analytics">
+                <i class="fas fa-chart-line"></i>
+                Lifetime Analytics
+            </a>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <div class="content-area analytics-page">
+
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon icon-purple"><i class="fa-solid fa-list-check"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Total Tasks</span>
+                        <span th:text="${tasksAnalytics.totalTasks}" class="metric-value">42</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-green"><i class="fas fa-check-circle"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Completed Tasks</span>
+                        <span th:text="${tasksAnalytics.completedTasks}" class="metric-value">18</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-pink"><i class="fas fa-percentage"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Completion Rate</span>
+                        <span th:text="${#numbers.formatDecimal(tasksAnalytics.completionRate, 2, 2)} + '%'" class="metric-value">43%</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-orange"><i class="fas fa-clock"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Avg Completion Time</span>
+                        <span th:text="${tasksAnalytics.avgCompletionTime} + 'days'" class="metric-value">2.4 days</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-red"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Overdue Tasks</span>
+                        <span th:text="${tasksAnalytics.overdueTasks}" class="metric-value">8</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Tasks by Status</h3>
+                        <p class="chart-subtitle">Distribution of task statuses</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Tasks by Priority</h3>
+                        <p class="chart-subtitle">Priority level breakdown</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon icon-blue"><i class="fas fa-folder"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Total Projects</span>
+                        <span th:text="${projectAnalytics.totalProjects}" class="metric-value">0</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-green"><i class="fas fa-play"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Active Projects</span>
+                        <span th:text="${projectAnalytics.activeProjects}" class="metric-value">0</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-purple"><i class="fas fa-check-double"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Completed Projects</span>
+                        <span th:text="${projectAnalytics.completedProjects}" class="metric-value">0</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-orange"><i class="fas fa-chart-line"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Avg. Progress</span>
+                        <span th:text="${projectAnalytics.averageProgress} + '%'" class="metric-value">0%</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon icon-red"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="metric-content">
+                        <span class="metric-label">Overdue Projects</span>
+                        <span th:text="${projectAnalytics.overdueProjects}" class="metric-value">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="projects-table-section">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Projects Overview</h3>
+                        <p class="table-subtitle">All projects with their progress and status</p>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="projects-table">
+                            <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Progress</th>
+                                <th>Tasks</th>
+                                <th>Status</th>
+                                <th>Visibility</th>
+                                <th>Creation Date</th>
+                                <th>Deadline</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="project : ${user.projects}">
+                                <td th:text="${project.title}" class="project-name">Website Redesign</td>
+                                <td>
+                                    <div class="progress-cell">
+                                        <div class="progress-bar-wrapper">
+                                            <div class="progress-bar-fill" style="width: 75%;" data-value="75"></div>
+                                        </div>
+                                        <span th:text="${project.completionPercent} + '%'" class="progress-text">75%</span>
+                                    </div>
+                                </td>
+                                <td th:text="${project.tasks.size()}" class="task-count">14</td>
+                                <td>
+                                    <span th:text="${project.status.name()}" class="status-badge status-active">Active</span>
+                                </td>
+                                <td class="project-visibility-cell">
+                                    <span th:if="${project.projectVisibility.name() == 'PRIVATE'}" th:text="${project.projectVisibility.getDisplayName()}" class="project-visibility private"></span>
+                                    <span th:if="${project.projectVisibility.name() == 'PUBLIC'}" th:text="${project.projectVisibility.getDisplayName()}" class="project-visibility public"></span>
+                                </td>
+                                <td class="creation-date">
+                                    <i class="far fa-calendar-plus"></i>
+                                    <span th:text="${#temporals.format(project.createdOn, 'dd MMM yyyy')}">15 Nov 2024</span>
+                                </td>
+                                <td class="deadline-cell">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span th:text="${#temporals.format(project.dueDate, 'dd MMM yyy HH:mm')}">Dec 15, 2024</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="insights-section">
+                <div class="insights-card">
+                    <div class="insights-header">
+                        <h3><i class="fas fa-lightbulb"></i> Insights & Warnings</h3>
+                    </div>
+                    <div class="insights-list" id="insightsList">
+                        <div class="insight-item insight-warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Overdue Tasks Alert</strong>
+                                <p>You have 8 overdue task(s) that need immediate attention.</p>
+                            </div>
+                        </div>
+                        <div class="insight-item insight-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Low Completion Rate</strong>
+                                <p>Your completion rate is 43%. Consider focusing on completing existing tasks before starting new ones.</p>
+                            </div>
+                        </div>
+                        <div class="insight-item insight-warning">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Extended Completion Time</strong>
+                                <p>Average task completion time is 2.4 days. Consider breaking down larger tasks into smaller ones.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+    const tasksAnalytics = {
+        status: {
+            completed: /*[[${tasksAnalytics.completedTasks}]]*/ 0,
+            inProgress: /*[[${tasksAnalytics.inProgressTasks}]]*/ 0,
+            todo: /*[[${tasksAnalytics.todoTasks}]]*/ 0,
+            overdue: /*[[${tasksAnalytics.overdueTasks}]]*/ 0
+        },
+        priority: {
+            low: /*[[${tasksAnalytics.lowPriorityCount}]]*/ 0,
+            medium: /*[[${tasksAnalytics.mediumPriorityCount}]]*/ 0,
+            high: /*[[${tasksAnalytics.highPriorityCount}]]*/ 0
+        },
+        metrics: {
+            completionRate: /*[[${tasksAnalytics.completionRate}]]*/ 0,
+            avgCompletionTime: /*[[${tasksAnalytics.avgCompletionTime}]]*/ 0
+        }
+    };
+    /*]]>*/
+
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'In Progress', 'Todo', 'Overdue'],
+            datasets: [{
+                data: [
+                    tasksAnalytics.status.completed || 0,
+                    tasksAnalytics.status.inProgress || 0,
+                    tasksAnalytics.status.todo || 0,
+                    tasksAnalytics.status.overdue || 0
+                ],
+                backgroundColor: [
+                    '#10b981',
+                    '#6366f1',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 12,
+                        font: { size: 12, weight: '600' },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: '700' },
+                    bodyFont: { size: 13 },
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.parsed;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            label += value + ' tasks (' + percentage + '%)';
+                            return label;
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [{
+            id: 'centerText',
+            beforeDraw: (chart) => {
+                const ctx = chart.ctx;
+                const data = chart.data.datasets[0].data;
+                const total = data.reduce((a, b) => a + b, 0);
+
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = 'bold 24px Inter';
+                ctx.fillStyle = '#1f2937';
+                ctx.fillText(total, chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2,
+                    chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2 - 10);
+                ctx.font = '600 14px Inter';
+                ctx.fillStyle = '#6b7280';
+                ctx.fillText('Total Tasks', chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2,
+                    chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2 + 12);
+                ctx.restore();
+            }
+        }, {
+            id: 'datalabels',
+            afterDraw: (chart) => {
+                const ctx = chart.ctx;
+                const data = chart.data.datasets[0].data;
+                const total = data.reduce((a, b) => a + b, 0);
+
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    meta.data.forEach((element, index) => {
+                        const value = dataset.data[index];
+                        const percentage = ((value / total) * 100).toFixed(0);
+                        const position = element.tooltipPosition();
+                        const angle = element.angle;
+                        const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                        const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+                        const radius = (element.outerRadius + element.innerRadius) / 2;
+                        const x = centerX + Math.cos(angle) * radius;
+                        const y = centerY + Math.sin(angle) * radius;
+
+                        ctx.save();
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 13px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(value, x, y - 6);
+                        ctx.font = 'bold 11px Inter';
+                        ctx.fillText(percentage + '%', x, y + 8);
+                        ctx.restore();
+                    });
+                });
+            }
+        }]
+    });
+
+    // Tasks by Priority Chart
+    const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+    new Chart(priorityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Low', 'Medium', 'High'],
+            datasets: [{
+                data: [
+                    tasksAnalytics.priority.low || 0,
+                    tasksAnalytics.priority.medium || 0,
+                    tasksAnalytics.priority.high || 0
+                ],
+                backgroundColor: [
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    bottom: 10
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: '700' },
+                    bodyFont: { size: 13 },
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed.y + ' tasks';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 12 },
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)',
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { size: 13, weight: '600' },
+                        color: '#1f2937'
+                    },
+                    grid: { display: false }
+                }
+            }
+        },
+        plugins: [{
+            id: 'datalabels',
+            afterDatasetsDraw: (chart) => {
+                const ctx = chart.ctx;
+                const data = chart.data.datasets[0].data;
+
+                chart.getDatasetMeta(0).data.forEach((bar, index) => {
+                    const value = data[index];
+                    const x = bar.x;
+                    const y = bar.y;
+
+                    ctx.save();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 14px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(value, x, y - 12);
+                    ctx.restore();
+                });
+            }
+        }]
+    });
+</script>
+
+</body>
+</html>

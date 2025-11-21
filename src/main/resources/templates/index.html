@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Modern Task Management</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-content">
+            <a th:href="@{/}" class="navbar-brand">TaskFlow</a>
+            <ul class="navbar-menu">
+                <li><a th:href="@{dashboard}" class="navbar-link active">Home</a></li>
+                <li><a th:href="@{features}" class="navbar-link">Features</a></li>
+                <li><a th:href="@{pricing}" class="navbar-link">Pricing</a></li>
+                <li><a th:href="@{login}" class="navbar-link">Login</a></li>
+                <li><a th:href="@{register}" class="btn btn-primary btn-sm">Get Started</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="hero" style="padding: 120px 0 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: relative; overflow: hidden;">
+
+    <div style="position: absolute; top: 10%; left: 10%; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+    <div style="position: absolute; bottom: 10%; right: 10%; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 8s ease-in-out infinite;"></div>
+
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+    </style>
+
+    <div class="container" style="position: relative; z-index: 1;">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease-out;">
+                Manage Your Tasks with <span style="background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Elegance</span>
+            </h1>
+            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; animation: fadeInUp 0.8s ease-out 0.2s backwards;">
+                The ultimate task management platform for teams and individuals. Organize, collaborate, and achieve your goals with style.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; animation: fadeInUp 0.8s ease-out 0.4s backwards;">
+                <a th:href="@{register}" class="btn btn-lg" style="background: white; color: #667eea; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    Start Free Trial
+                </a>
+                <a th:href="@{features}" class="btn btn-lg btn-outline" style="border-color: white; color: white;">
+                    Learn More
+                </a>
+            </div>
+        </div>
+
+        <div style="margin-top: 5rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: 3rem; border-radius: 2rem; border: 1px solid rgba(255,255,255,0.15); animation: fadeInUp 0.8s ease-out 0.6s backwards;">
+
+                <h3 style="text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 3rem; opacity: 0.95;">Why Teams Love TaskFlow</h3>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;">
+
+                    <div style="display: flex; gap: 1.25rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                            ✨
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Simple & Intuitive</h4>
+                            <p style="opacity: 0.85; line-height: 1.6; font-size: 0.95rem;">No learning curve. Start managing tasks in minutes, not hours.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1.25rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                            🚀
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Boost Productivity</h4>
+                            <p style="opacity: 0.85; line-height: 1.6; font-size: 0.95rem;">Get 30% more done with smart task prioritization and tracking.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1.25rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                            💎
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Beautiful Design</h4>
+                            <p style="opacity: 0.85; line-height: 1.6; font-size: 0.95rem;">A workspace you'll actually enjoy using every single day.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1.25rem; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                            🔐
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Always Secure</h4>
+                            <p style="opacity: 0.85; line-height: 1.6; font-size: 0.95rem;">Bank-level encryption keeps your data safe and private.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" style="padding: 80px 0;">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Powerful Features</h2>
+            <p style="color: var(--gray); font-size: 1.125rem;">Everything you need to manage tasks efficiently</p>
+        </div>
+
+        <div class="grid grid-cols-3">
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                    📋
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Task Management</h3>
+                <p style="color: var(--gray);">Create, organize, and track tasks with ease. Set priorities, deadlines, and assignments.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                    ⚡
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Priority Management</h3>
+                <p style="color: var(--gray);">Set task priorities and organize by urgency. Focus on what matters most with smart filtering.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                    📊
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Analytics & Reports</h3>
+                <p style="color: var(--gray);">Track progress with detailed analytics. Generate reports and insights for better decisions.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                    🔔
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Smart Notifications</h3>
+                <p style="color: var(--gray);">Never miss a deadline. Get notified about important updates and task changes.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                    🎨
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Customizable Views</h3>
+                <p style="color: var(--gray);">Choose between Kanban boards, lists, or calendar views. Work your way.</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 1.5rem; font-weight: 700;">
+                    🔒
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Secure & Private</h3>
+                <p style="color: var(--gray);">Your data is encrypted and secure. Role-based access control for team safety.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 100px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: relative; overflow: hidden;">
+
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 1px, transparent 1px), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 50px 50px;"></div>
+
+    <style>
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card {
+            animation: countUp 0.8s ease-out backwards;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            background: linear-gradient(to bottom, #ffffff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+
+    <div class="container" style="position: relative; z-index: 1;">
+        <div class="grid grid-cols-4" style="gap: 3rem;">
+
+            <div class="stat-card" style="text-align: center; animation-delay: 0s;">
+                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
+                    👥
+                </div>
+                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">10K+</div>
+                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Active Users</div>
+                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">Growing daily</div>
+            </div>
+
+            <div class="stat-card" style="text-align: center; animation-delay: 0.1s;">
+                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
+                    ✅
+                </div>
+                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">50K+</div>
+                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Tasks Completed</div>
+                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">And counting</div>
+            </div>
+
+            <div class="stat-card" style="text-align: center; animation-delay: 0.2s;">
+                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
+                    ⚡
+                </div>
+                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">99.9%</div>
+                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Uptime</div>
+                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">Always available</div>
+            </div>
+
+            <div class="stat-card" style="text-align: center; animation-delay: 0.3s;">
+                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
+                    💬
+                </div>
+                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">24/7</div>
+                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Support</div>
+                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">We're here to help</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section style="padding: 80px 0;">
+    <div class="container">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 4rem;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Ready to Get Started?</h2>
+            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">Join thousands of teams already using TaskFlow</p>
+            <a th:href="@{register}" class="btn btn-lg" style="background: white; color: #667eea;">
+                Start Your Free Trial
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>TaskFlow</h4>
+                <p>The modern way to manage tasks and collaborate with your team.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">API</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 TaskFlow. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

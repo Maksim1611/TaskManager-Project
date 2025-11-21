@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Task - TaskFlow</title>
+    <link rel="stylesheet" href="/css/add-task.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/tasks.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">TaskFlow</h1>
+        </div>
+
+        <nav class="nav">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="/projects" class="nav-link">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="/tasks" class="nav-link active">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </a>
+            <a href="/activity" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                Activity
+            </a>
+            <a href="/analytics" class="nav-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                Analytics
+            </a>
+            <a href="/notifications" class="nav-link">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <div sec:authorize="hasRole('ADMIN')" >
+                <a href="/users" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    Users
+                </a>
+            </div>
+            <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+                <a href="/notifications/sender" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    Alerts
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-profile">
+            <img th:if="${base64Image != null}"
+                 th:src="'data:image/png;base64,' + ${base64Image}"
+                 class="user-avatar"
+                 alt="User Avatar">
+
+            <div th:if="${base64Image == null}"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                 class="user-avatar">MS
+            </div>
+
+            <div class="user-info">
+                <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+                <div th:text="${user.email}" class="email"></div>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div class="header-left">
+                <h1 class="page-title">
+                    <span th:text="'Edit ' + ${editTaskRequest.title}" class="title-accent"></span>
+                </h1>
+                <p class="page-subtitle">Edit your task to stay organized and productive</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <div class="form-card">
+                <form class="add-task-form" th:action="@{'/tasks/' + ${taskId} + '/task'}" th:method="PUT" th:object="${editTaskRequest}">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-tasks"></i>
+                                Task Title
+                            </label>
+                            <input type="text" id="title" th:field="*{title}" class="form-input"
+                                   placeholder="Enter task title" required>
+                            <div class="field-hint">3-20 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </label>
+                            <textarea id="description" th:field="*{description}" class="form-textarea"
+                                      placeholder="Describe the task details..." rows="4"></textarea>
+                            <div class="field-hint">3-300 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="priority" class="form-label">
+                                <i class="fas fa-flag"></i>
+                                Priority
+                            </label>
+                            <select id="priority" th:field="*{priority}" class="form-select" required>
+                                <option th:each="priority : ${T(com.example.TaskManager.task.model.TaskPriority).values()}"
+                                        th:value="${priority}" th:text="${priority.getDisplayName()}">Select project...
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Due Date & Time
+                            </label>
+                            <input type="datetime-local" id="dueDate" th:field="*{dueDate}" class="form-input"
+                                   th:value="${editTaskRequest.dueDate != null ? #temporals.format(editTaskRequest.dueDate, 'yyyy-MM-dd''T''HH:mm')  : ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+
+                    </div>
+
+                    <div class="form-actions">
+                        <a th:href="@{/tasks}">
+                            <button type="button" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Cancel
+                            </button>
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Edit Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

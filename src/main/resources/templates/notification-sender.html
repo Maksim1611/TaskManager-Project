@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Notification - TaskFlow</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+
+<aside class="sidebar" xmlns:sec="http://www.w3.org/1999/xhtml">
+    <div class="sidebar-header">
+        <h1 class="logo">TaskFlow</h1>
+    </div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-link">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+        <a href="/projects" class="nav-link">
+            <i class="fas fa-folder"></i>
+            Projects
+        </a>
+        <a href="/tasks" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            Tasks
+        </a>
+        <a href="/activity" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Activity
+        </a>
+        <a href="/analytics" class="nav-link">
+            <i class="fa-solid fa-chart-simple"></i>
+            Analytics
+        </a>
+        <a href="/notifications" class="nav-link">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a href="/users" class="nav-link">
+                <i class="fa-solid fa-user"></i>
+                Users
+            </a>
+        </div>
+        <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+            <a href="/notifications/sender" class="nav-link active">
+                <i class="fa-solid fa-bullhorn"></i>
+                Alerts
+            </a>
+        </div>
+    </nav>
+
+    <div class="user-profile">
+        <img th:if="${base64Image != null}"
+             th:src="'data:image/png;base64,' + ${base64Image}"
+             class="user-avatar"
+             alt="User Avatar">
+
+        <div th:if="${base64Image == null}"
+             th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+             class="user-avatar">MS
+        </div>
+
+        <div class="user-info">
+            <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+            <div th:text="${user.email}" class="email"></div>
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <header class="header">
+        <div class="header-left">
+            <h1 class="title">Send Notification</h1>
+            <p class="subtitle">Create and send notifications to users</p>
+        </div>
+        <div class="header-right">
+            <a href="/notifications" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Notifications
+            </a>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <div class="notification-sender-container">
+            <div class="sender-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-paper-plane"></i> New Notification</h2>
+                    <p>Select notification type and fill in the details</p>
+                </div>
+
+                <form th:action="@{/notifications/sender}" th:method="POST" th:object="${notificationRequest}"
+                      class="notification-form">
+                    <div class="form-section">
+                        <label class="form-label">Notification Type</label>
+                        <div class="notification-type-buttons">
+                            <input type="radio" name="notificationType"
+                                   th:field="*{notificationType}"
+                                   th:value="'EMAIL'" id="type-email" class="type-radio"
+                                   checked>
+                            <label for="type-email" class="type-button">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                            </label>
+
+                            <input th:field="*{notificationType}"
+                            th:value="'REMINDER'" type="radio" name="notificationType" id="type-reminder"
+                                   class="type-radio">
+                            <label for="type-reminder" class="type-button">
+                                <i class="fas fa-clock"></i>
+                                <span>Reminder</span>
+                            </label>
+
+                            <input th:field="*{notificationType}"
+                                   th:value="'ALERT'"
+                                   type="radio" name="notificationType" id="type-alert"
+                                   class="type-radio">
+                            <label for="type-alert" class="type-button">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Alert</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input th:field="*{subject}"
+                               th:value="${notificationRequest.subject}"
+                               type="text"
+                               id="subject"
+                               name="subject"
+                               class="form-input"
+                               placeholder="Enter notification subject"
+                               required>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="body" class="form-label">Body</label>
+                        <textarea th:field="*{body}"
+                                  th:value="${notificationRequest.body}"
+                                  id="body"
+                                  name="body"
+                                  class="form-textarea"
+                                  rows="8"
+                                  placeholder="Enter notification message"
+                                  ></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-send">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Notification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Handle notification type button selection
+    document.querySelectorAll('.type-radio').forEach(radio => {
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('.type-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (this.checked) {
+                this.nextElementSibling.classList.add('active');
+            }
+        });
+    });
+
+    // Set initial active state
+    document.querySelector('.type-radio:checked').nextElementSibling.classList.add('active');
+</script>
+
+</body>
+</html>
+

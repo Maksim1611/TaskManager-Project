@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Completion - TaskFlow</title>
+    <link rel="stylesheet" href="/css/register.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="register-page">
+
+<div class="register-bg">
+    <div class="register-bg-circle"></div>
+    <div class="register-bg-circle"></div>
+    <div class="register-bg-circle"></div>
+</div>
+
+<div class="register-container">
+    <div class="card register-card">
+
+        <div class="register-header">
+            <div class="register-logo">
+                <div class="register-logo-icon">✨</div>
+            </div>
+            <h2 class="register-title">Complete Profile</h2>
+            <p class="register-subtitle">Complete your profile by infilling these fields</p>
+        </div>
+
+        <form th:action="@{/profile-completion}" th:method="POST" th:object="${userCreateDto}" >
+
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input th:field="*{username}" type="text" id="username" name="username" class="form-input" placeholder="johndoe" required>
+                <p th:if="${#fields.hasErrors()}" th:errors="*{username}">Error message</p>
+            </div>
+
+            <div class="name-grid">
+                <div class="form-group">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input th:field="*{firstName}" type="text" id="firstName" name="firstName" class="form-input" placeholder="John" required>
+                    <p th:if="${#fields.hasErrors()}" th:errors="*{firstName}">Error message</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input th:field="*{lastName}" type="text" id="lastName" name="lastName" class="form-input" placeholder="Doe" required>
+                    <p th:if="${#fields.hasErrors()}" th:errors="*{lastName}">Error message</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full register-btn">
+                Create Account →
+            </button>
+
+            <div class="register-divider">
+                <p class="register-divider-text">
+                    Already have an account?
+                    <a th:href="@{login}" class="register-divider-link">Sign in</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <div class="back-home">
+        <a th:href="@{/}" class="back-home-link">
+            ← Back to Home
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity - TaskFlow</title>
+    <link rel="stylesheet" href="/css/activity.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">TaskFlow</h1>
+        </div>
+
+        <nav class="nav">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="/projects" class="nav-link">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="/tasks" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </a>
+            <a href="/activity" class="nav-link active">
+                <i class="fa-solid fa-chart-line"></i>
+                Activity
+            </a>
+            <a href="/analytics" class="nav-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                Analytics
+            </a>
+            <a href="/notifications" class="nav-link">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/users" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    Users
+                </a>
+            </div>
+            <div sec:authorize="hasAnyRole('ADMIN','MODERATOR')">
+                <a href="/notifications" class="nav-link">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    Alerts
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-profile">
+            <img th:if="${base64Image != null}"
+                 th:src="'data:image/png;base64,' + ${base64Image}"
+                 class="user-avatar"
+                 alt="User Avatar">
+
+            <div th:if="${base64Image == null}"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                 class="user-avatar">MS
+            </div>
+
+            <div class="user-info">
+                <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+                <div th:text="${user.email}" class="email"></div>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">Activity</h1>
+                <p class="subtitle">Track your recent actions and progress</p>
+            </div>
+        </header>
+
+        <div class="content">
+            <section class="stats-grid">
+                <div class="stat-card purple">
+                    <div class="stat-icon purple"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" th:text="${activities != null ? activities.size() : 0}">0</div>
+                        <div class="stat-label">Total Activities</div>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon green"><i class="fas fa-tasks"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" th:text="${taskCount != null ? taskCount : 0}">0</div>
+                        <div class="stat-label">Task Actions</div>
+                    </div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon blue"><i class="fas fa-folder"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value" th:text="${projectCount != null ? projectCount : 0}">0</div>
+                        <div class="stat-label">Project Actions</div>
+                    </div>
+                </div>
+                <div class="stat-card teal">
+                    <div class="stat-icon teal"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value">Today</div>
+                        <div class="stat-label">Most Active</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="activities">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <div class="section-header-right">
+                        <span th:text="${activities != null ? activities.size() : 0} + ' Activities'" class="count">0 Activities</span>
+                    </div>
+                </div>
+
+                <div class="filter-tabs">
+                    <div class="filter-tabs-left">
+                        <button class="filter-tab active" data-filter="all">All</button>
+                        <button class="filter-tab" data-filter="task">Tasks</button>
+                        <button class="filter-tab" data-filter="project">Projects</button>
+                    </div>
+                    <form th:action="@{'/activity/' + ${user.id}}" th:method="DELETE">
+                        <button type="submit" class="btn btn-clear-activity">
+                            <i class="fas fa-trash-alt"></i>
+                            Clear Activity
+                        </button>
+                    </form>
+                </div>
+
+                <div class="activities-list" th:if="${activities != null and !activities.isEmpty()}">
+                    <div class="activity-item" th:each="act : ${activities}" th:data-type="${act.type.name().toLowerCase().contains('project') ? 'project' : 'task'}">
+                        <div class="activity-icon-wrapper">
+                            <div th:if="${act.type.name() == 'TASK_CREATED'}" class="activity-icon blue">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'TASK_UPDATED'}" class="activity-icon orange">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'TASK_COMPLETED'}" class="activity-icon green">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'TASK_DELETED'}" class="activity-icon red">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_CREATED'}" class="activity-icon blue">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_UPDATED'}" class="activity-icon orange">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_COMPLETED'}" class="activity-icon green">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_DELETED'}" class="activity-icon red">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_TASK_CREATED'}" class="activity-icon blue">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_TASK_UPDATED'}" class="activity-icon orange">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_TASK_COMPLETED'}" class="activity-icon green">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div th:if="${act.type.name() == 'PROJECT_TASK_DELETED'}" class="activity-icon red">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+
+                        <div class="activity-content">
+                            <div class="activity-header-row">
+                                <span class="activity-type-badge" th:classappend="${act.type.name().contains('PROJECT') ? 'project' : 'task'}">
+                                    <span th:text="${act.type.name().contains('PROJECT') ? 'Project' : 'Task'}"></span>
+                                </span>
+                                <span class="activity-action" th:text="${act.type.name().replace('_', ' ')}"></span>
+                            </div>
+                            <p class="activity-message" th:text="${act.message}"></p>
+                            <div class="activity-footer">
+                                <span class="activity-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${act.dateOutput != null ? act.dateOutput : #temporals.format(act.createdOn, 'MMM dd, yyyy • HH:mm')}"></span>
+                                </span>
+                                <span class="activity-user">
+                                    <i class="fas fa-user"></i>
+                                    <span>You</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${activities == null or activities.isEmpty()}">
+                    <div class="empty-illustration">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>No Activity Yet</h3>
+                    <p>Your activity feed will show your recent actions here once you start creating tasks and projects.</p>
+                    <div class="empty-actions">
+                        <a href="/tasks" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Task
+                        </a>
+                        <a href="/projects/new-project" class="btn btn-primary">
+                            <i class="fas fa-folder-plus"></i>
+                            New Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/activity.js"></script>
+</body>
+</html>
