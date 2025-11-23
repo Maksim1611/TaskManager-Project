@@ -184,40 +184,47 @@ body {
     margin: 0;
 }
 
-.status-badge {
-    padding: 0.375rem 0.75rem;
+.status {
+    padding: 0.375rem 0.875rem;
     border-radius: 8px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-.status-badge i {
-    font-size: 0.35rem;
+.status i {
+    font-size: 0.5rem;
 }
 
-.status-badge.status-active {
-    background: #d1fae5;
+.status.active {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
     color: #059669;
 }
 
-.status-badge.status-in-progress {
-    background: #dbeafe;
+.status.in-progress {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #2563eb;
 }
 
-.status-badge.status-onhold {
-    background: #fef3c7;
+.status.onhold {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     color: #d97706;
 }
 
-.status-badge.status-completed {
-    background: #dbeafe;
+.status.completed {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #2563eb;
+}
+
+.status.overdue {
+    background: linear-gradient(135deg, #fda085 0%, #f6d365 100%);
+    color: #5a3e1b;
+    box-shadow: 0 4px 12px rgba(253, 160, 133, 0.25);
 }
 
 .project-description {
@@ -470,12 +477,25 @@ body {
 
 .task-count-badge {
     padding: 0.25rem 0.75rem;
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6) !important;
     color: #ffffff !important;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6) !important;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
     margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-width: 24px;
+    height: 24px;
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: padding-box !important;
+    -webkit-background-clip: padding-box !important;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-primary {

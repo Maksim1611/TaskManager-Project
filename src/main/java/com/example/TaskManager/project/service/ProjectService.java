@@ -3,6 +3,8 @@ package com.example.TaskManager.project.service;
 import com.example.TaskManager.activity.model.ActivityType;
 import com.example.TaskManager.activity.service.ActivityService;
 import com.example.TaskManager.analytics.service.ProjectAnalyticsService;
+import com.example.TaskManager.exception.MemberAlreadyExistException;
+import com.example.TaskManager.exception.user.MemberNotFoundException;
 import com.example.TaskManager.project.event.ProjectOverdueEvent;
 import com.example.TaskManager.project.event.ProjectUpcomingDeadlineEvent;
 import com.example.TaskManager.project.model.Project;
@@ -11,17 +13,15 @@ import com.example.TaskManager.project.repository.ProjectRepository;
 import com.example.TaskManager.tag.model.Tag;
 import com.example.TaskManager.tag.repository.TagRepository;
 import com.example.TaskManager.tag.service.TagService;
-import com.example.TaskManager.task.event.TaskOverdueEvent;
-import com.example.TaskManager.task.event.TaskUpcomingDeadlineEvent;
-import com.example.TaskManager.task.model.Task;
 import com.example.TaskManager.task.model.TaskStatus;
 import com.example.TaskManager.task.repository.TaskRepository;
 import com.example.TaskManager.task.service.TaskService;
 import com.example.TaskManager.user.model.User;
-import com.example.TaskManager.user.repository.UserRepository;
 import com.example.TaskManager.user.service.UserService;
 import com.example.TaskManager.web.dto.CreateProjectRequest;
 import com.example.TaskManager.web.dto.EditProjectRequest;
+import com.example.TaskManager.web.dto.InviteMemberRequest;
+import com.example.TaskManager.web.dto.RemoveMemberRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -261,5 +260,51 @@ public class ProjectService {
             update(project);
         }
 
+    }
+
+    public void inviteMember(InviteMemberRequest inviteMemberRequest, UUID projectId, User user) {
+        Project project = getByIdNotDeleted(projectId);
+        User invited = userService.getByUsername(inviteMemberRequest.getUsername());
+
+        List<User> members = project.getMembers();
+
+        if (invited == null) {
+            throw new MemberNotFoundException("User [%s] does not exist".formatted(inviteMemberRequest.getUsername()));
+        }
+
+        if (inviteMemberRequest.getUsername().equals(user.getUsername())) {
+            throw new MemberAlreadyExistException("You cannot add yourself to a project.");
+        }
+
+        if (members.contains(invited)) {
+            throw new MemberAlreadyExistException("This user is already included in the project.");
+        }
+
+        members.add(invited);
+        update(project);
+    }
+
+    public List<Project> getProjectsIncludedIn(User user) {
+        List<Project> projects = projectRepository.findAllByDeletedFalse();
+
+        return projects.stream().filter(p -> p.getUser().getId().equals(user.getId()) || p.getMembers().contains(user)).toList();
+    }
+
+    public void removeMember(UUID id, User user, @Valid RemoveMemberRequest removeMemberRequest) {
+        Project project = getByIdNotDeleted(id);
+        User removed = userService.getByUsername(removeMemberRequest.getUsername());
+
+        List<User> members = project.getMembers();
+
+        if (removed == null) {
+            throw new MemberNotFoundException("User [%s] does not exist".formatted(removeMemberRequest.getUsername()));
+        } else if (!members.contains(removed)) {
+            throw new MemberNotFoundException("This user is not included in the project.");
+        } else if (user.getUsername().equals(removed.getUsername())) {
+            throw new MemberNotFoundException("You cannot remove yourself from a project.");
+        }
+
+        members.remove(removed);
+        update(project);
     }
 }

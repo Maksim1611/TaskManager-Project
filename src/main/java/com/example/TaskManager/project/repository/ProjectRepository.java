@@ -30,4 +30,6 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     List<Project> findByStatusNotAndDeletedFalse(ProjectStatus status);
 
     Optional<Project> findByIdAndDeletedFalse(UUID id);
+
+    List<Project> findAllByDeletedFalse();
 }

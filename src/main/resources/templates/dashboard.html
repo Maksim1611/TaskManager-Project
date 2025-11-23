@@ -36,7 +36,9 @@
                                  class="avatar"
                                  alt="User Avatar">
 
-                            <div th:if="${base64Image == null}" th:text="${user.firstName.charAt(0)} + ${user.lastName.charAt(0)}" class="avatar">MSa</div>
+                            <div th:if="${base64Image == null}"
+                                 th:text="${user.firstName.charAt(0)} + ${user.lastName.charAt(0)}" class="avatar">MSa
+                            </div>
                         </div>
                     </a>
                 </li>
@@ -64,7 +66,8 @@
                     <div class="stat-card-icon">📁</div>
                 </div>
                 <div class="stat-card-footer">
-                    <span th:text="'↗ ' + ${activeProjectsCount} + ' active projects'" class="stat-card-footer-text"></span>
+                    <span th:text="'↗ ' + ${activeProjectsCount} + ' active projects'"
+                          class="stat-card-footer-text"></span>
                 </div>
             </div>
 
@@ -77,7 +80,8 @@
                     <div class="stat-card-icon">✅</div>
                 </div>
                 <div class="stat-card-footer">
-                    <span th:text="${dueThisWeek} + ' due this week'" class="stat-card-footer-text">12 due this week</span>
+                    <span th:text="${dueThisWeek} + ' due this week'"
+                          class="stat-card-footer-text">12 due this week</span>
                 </div>
             </div>
 
@@ -90,7 +94,8 @@
                     <div class="stat-card-icon">🎯</div>
                 </div>
                 <div class="stat-card-footer">
-                    <span th:text="'↗ ' + ${completionRate} + '% completion rate'" class="stat-card-footer-text">↗ 65% </span>
+                    <span th:text="'↗ ' + ${completionRate} + '% completion rate'"
+                          class="stat-card-footer-text">↗ 65% </span>
                 </div>
             </div>
 
@@ -113,38 +118,52 @@
 
             <div>
                 <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3 class="card-title">Recent Tasks</h3>
-                            <a href="/tasks" class="btn btn-sm btn-outline">View All</a>
+                    <div class="card-header styled-header">
+                        <div class="header-title-wrapper">
+                            <div class="header-icon tasks-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="header-title-content">
+                                <div class="header-title-row">
+                                    <h3 class="card-title styled-title">Recent Tasks</h3>
+                                    <a href="/tasks" class="btn btn-sm btn-outline">View All</a>
+                                </div>
+                                <p class="header-subtitle">Your latest task updates</p>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div th:unless="${recentTasks.isEmpty()}" class="tasks-list">
                             <div th:each="task : ${recentTasks}">
-                                <div class="task-item">
-                                    <div class="task-header">
-                                        <div>
-                                            <h4 th:text="${task.title}" class="task-title">Design homepage
+                                <div class="task-item-enhanced">
+                                    <div class="task-header-enhanced">
+                                        <div class="task-content-wrapper">
+                                            <h4 th:text="${task.title}" class="task-title-enhanced">Design homepage
                                                 mockup</h4>
                                             <p th:text="${task.project == null ? 'None' : task.project.title}"
-                                               class="task-project">Website Redesign</p>
+                                               class="task-project-enhanced">
+                                                <i class="fas fa-folder"></i>
+                                                <span th:text="${task.project == null ? 'None' : task.project.title}">Website Redesign</span>
+                                            </p>
                                         </div>
-                                        <div class="task-info">
+                                        <div class="task-info-enhanced">
                                             <span th:if="${task.priority.name == 'LOW'}"
                                                   th:text="${task.priority.displayName} + ' Priority'"
-                                                  class="task-badge low">Low</span>
+                                                  class="task-badge low">Low Priority</span>
                                             <span th:if="${task.priority.name == 'MEDIUM'}"
                                                   th:text="${task.priority.displayName} + ' Priority'"
-                                                  class="task-badge medium">Low</span>
+                                                  class="task-badge medium">Medium Priority</span>
                                             <span th:if="${task.priority.name == 'HIGH'}"
                                                   th:text="${task.priority.displayName} + ' Priority'"
-                                                  class="task-badge high">Low</span>
+                                                  class="task-badge high">High Priority</span>
                                         </div>
                                     </div>
-                                    <div class="task-footer">
-                                        <span th:text="'Due: ' + ${#temporals.format(task.dueDate, 'dd MMM yyyy HH:MM')}"
-                                              class="task-date"></span>
+                                    <div class="task-footer-enhanced">
+                                        <div class="task-date-wrapper">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span th:text="'Due: ' + ${#temporals.format(task.dueDate, 'dd MMM yyyy HH:mm')}"
+                                                  class="task-date-enhanced"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -160,10 +179,18 @@
 
             <div>
                 <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3 class="card-title">Recent Projects</h3>
-                            <a href="/projects" class="btn btn-sm btn-outline">View All</a>
+                    <div class="card-header styled-header">
+                        <div class="header-title-wrapper">
+                            <div class="header-icon projects-icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="header-title-content">
+                                <div class="header-title-row">
+                                    <h3 class="card-title styled-title">Recent Projects</h3>
+                                    <a href="/projects" class="btn btn-sm btn-outline">View All</a>
+                                </div>
+                                <p class="header-subtitle">Your latest project updates</p>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -180,37 +207,48 @@
                                     <div class="project-header-content">
                                         <div class="project-title-row">
                                             <h4 th:text="${project.title}" class="project-title">Website Redesign</h4>
-                                            <span th:if="${project.status.name() == 'ACTIVE'}" class="badge badge-active">ACTIVE</span>
-                                            <span th:if="${project.status.name() == 'ON_HOLD'}" class="badge badge-hold">ON HOLD</span>
-                                            <span th:if="${project.status.name() == 'IN_PROGRESS'}" class="badge badge-progress">IN PROGRESS</span>
-                                            <span th:if="${project.status.name() == 'COMPLETED'}" class="badge badge-completed">COMPLETED</span>
+                                            <span th:if="${project.status.name() == 'ACTIVE'}"
+                                                  class="badge badge-active">ACTIVE</span>
+                                            <span th:if="${project.status.name() == 'ON_HOLD'}"
+                                                  class="badge badge-hold">ON HOLD</span>
+                                            <span th:if="${project.status.name() == 'IN_PROGRESS'}"
+                                                  class="badge badge-progress">IN PROGRESS</span>
+                                            <span th:if="${project.status.name() == 'COMPLETED'}"
+                                                  class="badge badge-completed">COMPLETED</span>
                                         </div>
-                                        <p th:text="${project.description}" class="project-description">Complete overhaul of company website</p>
+                                        <p th:text="${project.description}" class="project-description">Complete
+                                            overhaul of company website</p>
 
-                                        <div class="project-tags" th:if="${project.tags != null and !project.tags.isEmpty()}">
-                                            <span th:each="tag : ${project.tags}" class="project-tag" th:text="${tag.title}">Design</span>
+                                        <div class="project-tags"
+                                             th:if="${project.tags != null and !project.tags.isEmpty()}">
+                                            <span th:each="tag : ${project.tags}" class="project-tag"
+                                                  th:text="${tag.title}">Design</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="project-progress">
                                     <div class="project-progress-header">
                                         <span class="project-progress-label">Progress</span>
-                                        <span class="project-progress-value" th:text="${(project.completionPercent ?: 0)} + '%'">0%</span>
+                                        <span class="project-progress-value"
+                                              th:text="${(project.completionPercent ?: 0)} + '%'">0%</span>
                                     </div>
                                     <div class="progress">
-                                        <div th:if="${project.completionPercent >= 0}" class="progress-fill" th:style="|width: ${project.completionPercent ?: 0}%|"></div>
+                                        <div th:if="${project.completionPercent >= 0}" class="progress-fill"
+                                             th:style="|width: ${project.completionPercent ?: 0}%|"></div>
                                     </div>
                                 </div>
                                 <div class="project-footer">
                                     <div class="project-footer-left">
                                         <i class="fas fa-calendar-alt"></i>
-                                        <span th:text="${'Due: ' + #temporals.format(project.dueDate, 'dd MMM yyyy')}" class="project-due">Due: Dec 15</span>
+                                        <span th:text="${'Due: ' + #temporals.format(project.dueDate, 'dd MMM yyyy')}"
+                                              class="project-due">Due: Dec 15</span>
                                     </div>
                                     <div class="project-actions-mini">
                                         <a th:href="@{'/projects/' + ${project.id}}" class="action-link" title="View">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a th:href="@{'/projects/' + ${project.id} + '/project'}" class="action-link" title="Edit">
+                                        <a th:href="@{'/projects/' + ${project.id} + '/project'}" class="action-link"
+                                           title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </div>
@@ -228,22 +266,115 @@
         <div class="grid grid-cols-2 content-grid">
             <div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Upcoming Deadlines</h3>
+                    <div class="card-header styled-header">
+                        <div class="header-title-wrapper">
+                            <div class="header-icon deadlines-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title styled-title">Upcoming Deadlines</h3>
+                                <p class="header-subtitle">Tasks requiring your attention</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div th:each="task : ${upcomingTasks}" class="deadline-item">
-                            <div class="deadline-header">
-                                <h5 th:text="${task.getTitle()}" class="deadline-title">Homepage Design</h5>
-                                <span th:text="${#temporals.format(task.getDueDate(), 'dd MMM yyyy HH:mm')}" class="badge badge-danger deadline-badge">Today</span>
+                        <div th:if="${upcomingTasks != null and !upcomingTasks.isEmpty()}">
+                            <div th:each="task : ${upcomingTasks}" class="deadline-item-enhanced">
+                                <div class="deadline-content">
+                                    <div class="deadline-icon-wrapper">
+                                        <i class="fas fa-flag"></i>
+                                    </div>
+                                    <div class="deadline-info">
+                                        <h5 th:text="${task.getTitle()}" class="deadline-title-enhanced">Homepage
+                                            Design</h5>
+                                        <div class="deadline-meta">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span th:text="${#temporals.format(task.getDueDate(), 'dd MMM yyyy HH:mm')}"
+                                                  class="deadline-date">Today</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        <div th:if="${upcomingTasks == null or upcomingTasks.isEmpty()}" class="empty-state">
+                            <p>No upcoming deadlines</p>
                         </div>
                     </div>
                 </div>
             </div>
+            <div>
+                <div class="card">
+                    <div class="card-header styled-header">
+                        <div class="header-title-wrapper">
+                            <div class="header-icon activity-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title styled-title">Recent Activity</h3>
+                                <p class="header-subtitle">Latest updates and changes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="activities-list" th:if="${recentActivity != null and !recentActivity.isEmpty()}">
+                            <div class="activity-item" th:each="act : ${recentActivity}"
+                                 th:data-type="${act.type.name().toLowerCase().contains('project') ? 'project' : 'task'}">
+                                <div class="activity-icon-wrapper">
+                                    <div th:if="${act.type.name() == 'TASK_CREATED'}" class="activity-icon blue">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'TASK_UPDATED'}" class="activity-icon orange">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'TASK_COMPLETED'}" class="activity-icon green">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'TASK_DELETED'}" class="activity-icon red">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_CREATED'}" class="activity-icon blue">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_UPDATED'}" class="activity-icon orange">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_COMPLETED'}" class="activity-icon green">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_DELETED'}" class="activity-icon red">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_TASK_CREATED'}"
+                                         class="activity-icon blue">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_TASK_UPDATED'}"
+                                         class="activity-icon orange">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_TASK_COMPLETED'}"
+                                         class="activity-icon green">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div th:if="${act.type.name() == 'PROJECT_TASK_DELETED'}" class="activity-icon red">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                </div>
+
+                                <div class="activity-text">
+                                    <p th:text="${act.message}">Completed "Team meeting preparation"</p>
+                                    <span th:text="${act.dateOutput}">2 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${recentActivity == null or recentActivity.isEmpty()}" class="empty-state">
+                    <p>No recent activity</p>
+                </div>
+            </div>
         </div>
-
-
     </div>
 </main>
 
@@ -251,3 +382,4 @@
 
 </body>
 </html>
+

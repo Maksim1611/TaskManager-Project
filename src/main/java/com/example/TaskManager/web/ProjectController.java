@@ -2,15 +2,16 @@ package com.example.TaskManager.web;
 
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.project.model.ProjectStatus;
+import com.example.TaskManager.project.security.ProjectSecurity;
 import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.project.service.ProjectService;
 import com.example.TaskManager.task.model.Task;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.service.UserService;
-import com.example.TaskManager.web.dto.CreateProjectRequest;
-import com.example.TaskManager.web.dto.DtoMapper;
-import com.example.TaskManager.web.dto.EditProjectRequest;
+import com.example.TaskManager.web.dto.*;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -27,10 +28,12 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final UserService userService;
+    private final ProjectSecurity projectSecurity;
 
-    public ProjectController(ProjectService projectService, UserService userService) {
+    public ProjectController(ProjectService projectService, UserService userService, ProjectSecurity projectSecurity) {
         this.projectService = projectService;
         this.userService = userService;
+        this.projectSecurity = projectSecurity;
     }
 
     @GetMapping
@@ -42,7 +45,7 @@ public class ProjectController {
         if (status != null) {
             projects = projectService.getAllByUserIdAndDeletedFalseAndStatus(user.getId(), ProjectStatus.valueOf(status));
         } else {
-            projects = projectService.getAllByUserIdAndDeletedFalse(userData.getId());
+            projects = projectService.getProjectsIncludedIn(user);
         }
 
         mv.addObject("projects",projects);
@@ -68,6 +71,7 @@ public class ProjectController {
         mv.addObject("project",project);
         mv.addObject("tasks",tasks);
         mv.addObject("members",members);
+        mv.addObject("isOwner", project.getUser().getId().equals(user.getId()));
 
         return mv;
     }
@@ -96,6 +100,7 @@ public class ProjectController {
         return new ModelAndView("redirect:/projects");
     }
 
+    @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
     @GetMapping("/{id}/project")
     public ModelAndView getEditProjectPage(@AuthenticationPrincipal UserData userData, @PathVariable UUID id) {
         ModelAndView mv = new ModelAndView("edit-project");
@@ -110,6 +115,7 @@ public class ProjectController {
 
         return mv;
     }
+
 
     @PutMapping("/{id}/project")
     public ModelAndView editProject(@Valid @ModelAttribute EditProjectRequest editProjectRequest, BindingResult bindingResult, @AuthenticationPrincipal UserData userData, @PathVariable UUID id) {
@@ -130,10 +136,61 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
+    @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
     @DeleteMapping("/{id}/project")
     public ModelAndView deleteProject(@PathVariable UUID id) {
         projectService.delete(id);
         return new ModelAndView("redirect:/projects");
+    }
+
+    @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
+    @GetMapping("/{id}/invitation")
+    public ModelAndView getMemberPage(@AuthenticationPrincipal UserData userData, @PathVariable UUID id) {
+        ModelAndView mv = new ModelAndView("invite-member");
+        mv.addObject("user",userService.getById(userData.getId()));
+        mv.addObject("inviteMemberRequest",new InviteMemberRequest());
+        return mv;
+    }
+
+    @PostMapping("/{id}/invitation")
+    public ModelAndView addMemberPage(@AuthenticationPrincipal UserData userData, @PathVariable UUID id,@ModelAttribute InviteMemberRequest inviteMemberRequest, BindingResult bindingResult) {
+        User user = userService.getById(userData.getId());
+
+        if (bindingResult.hasErrors()) {
+            ModelAndView mv = new ModelAndView();
+            mv.addObject("user", user);
+            mv.setViewName("invite-member");
+            return mv;
+        }
+
+        projectService.inviteMember(inviteMemberRequest, id, user);
+        return new ModelAndView("redirect:/projects/%s".formatted(id));
+    }
+
+    @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
+    @GetMapping("/{id}/member")
+    public ModelAndView removeMemberPage(@PathVariable UUID id, @AuthenticationPrincipal UserData userData) {
+        ModelAndView mv = new ModelAndView("remove-member");
+        mv.addObject("user", userService.getById(userData.getId()));
+        mv.addObject("removeMemberRequest",new RemoveMemberRequest());
+        return mv;
+    }
+
+    @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
+    @PostMapping("/{id}/member")
+    public ModelAndView removeMember(@PathVariable UUID id, @Valid @ModelAttribute RemoveMemberRequest removeMemberRequest,
+                               @AuthenticationPrincipal UserData userData ,BindingResult bindingResult) {
+        User user = userService.getById(userData.getId());
+
+        if (bindingResult.hasErrors()) {
+            ModelAndView mv = new ModelAndView();
+            mv.addObject("user", user);
+            mv.setViewName("remove-member");
+            return mv;
+        }
+
+        projectService.removeMember(id, user, removeMemberRequest);
+        return new ModelAndView("redirect:/projects/%s".formatted(id));
     }
 
 }

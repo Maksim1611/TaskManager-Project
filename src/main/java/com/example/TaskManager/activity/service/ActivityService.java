@@ -4,11 +4,9 @@ import com.example.TaskManager.activity.model.Activity;
 import com.example.TaskManager.activity.model.ActivityType;
 import com.example.TaskManager.activity.repository.ActivityRepository;
 import com.example.TaskManager.project.model.Project;
-import com.example.TaskManager.summary.model.SummaryDto;
 import com.example.TaskManager.task.model.Task;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.utils.ActivityUtils;
-import com.example.TaskManager.web.dto.DtoMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

@@ -136,6 +136,9 @@
                                 Project Status
                             </label>
                             <select th:field="*{projectStatus}" id="project" class="form-select">
+                                <option th:if="${editProjectRequest.projectStatus.name() == 'OVERDUE'}" th:value="${T(com.example.TaskManager.project.model.ProjectStatus).valueOf('OVERDUE')}" th:text="'Overdue'"></option>
+                                <option th:if="${editProjectRequest.projectStatus.name() == 'COMPLETED'}" th:value="${T(com.example.TaskManager.project.model.ProjectStatus).valueOf('COMPLETED')}" th:text="'Completed'"></option>
+
                                 <option th:each="status : ${T(com.example.TaskManager.project.model.ProjectStatus).values()}"
                                         th:if="${status.name() != 'COMPLETED' && status.name() != 'OVERDUE'}" th:value="${status}"
                                         th:text="${status.getDisplayName()}">Select project...

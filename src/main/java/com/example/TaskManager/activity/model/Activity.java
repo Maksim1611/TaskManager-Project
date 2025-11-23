@@ -3,7 +3,6 @@ package com.example.TaskManager.activity.model;
 import com.example.TaskManager.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

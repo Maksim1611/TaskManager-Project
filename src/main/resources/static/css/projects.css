@@ -574,8 +574,9 @@ body {
 }
 
 .status.overdue {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    color: #dc2626;
+    background: linear-gradient(135deg, #fda085 0%, #f6d365 100%);
+    color: #5a3e1b;
+    box-shadow: 0 4px 12px rgba(253, 160, 133, 0.25);
 }
 
 .tasks {

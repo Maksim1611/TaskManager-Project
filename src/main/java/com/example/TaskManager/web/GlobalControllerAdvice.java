@@ -1,7 +1,9 @@
 package com.example.TaskManager.web;
 
+import com.example.TaskManager.exception.MemberAlreadyExistException;
 import com.example.TaskManager.exception.TaskAlreadyExistException;
 import com.example.TaskManager.exception.user.EmailAlreadyExistException;
+import com.example.TaskManager.exception.user.MemberNotFoundException;
 import com.example.TaskManager.exception.user.UserNotFoundException;
 import com.example.TaskManager.exception.user.UsernameAlreadyExistException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,4 +72,22 @@ public class GlobalControllerAdvice {
         return "redirect:/register";
     }
 
+    @ExceptionHandler(MemberAlreadyExistException.class)
+    public String handleMemberAlreadyExistException(MemberAlreadyExistException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessageMember", ex.getMessage());
+        return "redirect:/projects/{id}/invitation";
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public String handleMemberNotFoundException(MemberNotFoundException ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+
+        String uri = request.getRequestURI();
+        redirectAttributes.addFlashAttribute("errorMessageMember", ex.getMessage());
+
+        if (uri.endsWith("/invitation")) {
+            return "redirect:/projects/{id}/invitation";
+        } else {
+            return "redirect:/projects/{id}/member";
+        }
+    }
 }

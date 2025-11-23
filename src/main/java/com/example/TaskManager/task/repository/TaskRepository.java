@@ -3,14 +3,12 @@ package com.example.TaskManager.task.repository;
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.task.model.Task;
 import com.example.TaskManager.task.model.TaskStatus;
-import com.example.TaskManager.user.model.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,4 +37,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> findAllByUserIdAndStatusNotAndStatusNotAndDeletedFalseAndProjectNullOrderByDueDateAsc(UUID id, TaskStatus taskStatus, TaskStatus taskStatus1);
 
     List<Task> findAllByUserIdAndDeletedFalseOrderByCreatedOnDesc(UUID id);
+
+    Optional<Task> findByTitleAndProjectNullAndDeletedFalse( String title);
 }

@@ -97,10 +97,12 @@
                     <i class="fas fa-arrow-left"></i>
                     Back to Projects
                 </a>
-                <a th:href="@{'/projects/' + ${project.id} + '/project'}" class="btn btn-secondary">
-                    <i class="fas fa-edit"></i>
-                    Edit
-                </a>
+                <th:block th:if="${project.getUser().getUsername().equals(user.getUsername())}">
+                    <a th:href="@{'/projects/' + ${project.id} + '/project'}" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </a>
+                </th:block>
             </div>
         </header>
 
@@ -113,19 +115,38 @@
                     <div class="project-header-info">
                         <div class="project-title-row">
                             <h2 th:text="${project.title}">Website Redesign</h2>
-                            <span th:if="${project.status.name == 'ACTIVE'}" class="status-badge status-active">
+                            <span th:if="${project.status.name == 'ACTIVE'}" class="status active">
                                 <i class="fas fa-circle"></i> Active
                             </span>
                             <span th:if="${project.status.name == 'IN_PROGRESS'}"
-                                  class="status-badge status-in-progress">
+                                  class="status in-progress">
                                 <i class="fas fa-circle"></i> In Progress
                             </span>
-                            <span th:if="${project.status.name == 'ON_HOLD'}" class="status-badge status-onhold">
+                            <span th:if="${project.status.name == 'ON_HOLD'}" class="status onhold">
                                 <i class="fas fa-circle"></i> On Hold
                             </span>
-                            <span th:if="${project.status.name == 'COMPLETED'}" class="status-badge status-completed">
+                            <span th:if="${project.status.name == 'COMPLETED'}" class="status completed">
                                 <i class="fas fa-circle"></i> Completed
                             </span>
+                            <span th:if="${project.status.name == 'OVERDUE'}" class="status overdue">
+                                <i class="fas fa-circle"></i> Overdue
+                            </span>
+                            <th:block th:if="${project.getUser().getUsername().equals(user.getUsername())}">
+                                <div style="display: flex; gap: 0.75rem; margin-left: auto; align-items: center;">
+                                    <a th:href="@{'/projects/' + ${project.id} + '/invitation'}"
+                                       class="btn-complete-project"
+                                       style="text-decoration: none; padding: 0.5rem 1rem; font-size: 0.8125rem;">
+                                        <i class="fas fa-user-plus"></i>
+                                        Invite member
+                                    </a>
+                                    <a th:href="@{'/projects/' + ${project.id} + '/member'}"
+                                       class="btn-complete-project"
+                                       style="text-decoration: none; padding: 0.5rem 1rem; font-size: 0.8125rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+                                        <i class="fas fa-user-minus"></i>
+                                        Remove Member
+                                    </a>
+                                </div>
+                            </th:block>
                         </div>
                         <p class="project-description" th:text="${project.description}">
                             Complete overhaul of company website with modern design, improved UX, and mobile
@@ -139,114 +160,125 @@
                         <div class="progress-content">
                             <div class="progress-header">
                                 <span class="progress-label">Progress</span>
-                                <span class="progress-percentage" th:text="${project.completionPercent != 0 ? project.completionPercent : 0} + '%'">65%</span>
+                                <span class="progress-percentage"
+                                      th:text="${project.completionPercent != 0 ? project.completionPercent : 0} + '%'">65%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" th:style="|width: ${project.completionPercent != 0 ? project.completionPercent : 0}%|"></div>
+                                <div class="progress-fill"
+                                     th:style="|width: ${project.completionPercent != 0 ? project.completionPercent : 0}%|"></div>
                             </div>
                         </div>
-                        <form th:if="${project.status.name != 'COMPLETED'}" th:action="@{'/projects/' + ${project.id} + '/project'}" method="post" style="margin: 0;">
-                            <input type="hidden" name="_method" value="patch"/>
-                            <button type="submit" class="btn-complete-project">
-                                <i class="fas fa-check-circle"></i>
-                                Complete Project
-                            </button>
-                        </form>
+                        <th:block th:if="${project.getUser().getUsername().equals(user.getUsername())}">
+                            <form th:if="${project.status.name != 'COMPLETED'}"
+                                  th:action="@{'/projects/' + ${project.id} + '/project'}" method="post"
+                                  style="margin: 0;">
+                                <input type="hidden" name="_method" value="patch"/>
+                                <button type="submit" class="btn-complete-project">
+                                    <i class="fas fa-check-circle"></i>
+                                    Complete Project
+                                </button>
+                            </form>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-grid">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <div class="info-icon purple">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3>Information</h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-icon-small purple">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">CREATION DATE</div>
+                            <div class="info-value"
+                                 th:text="${project.createdOn != null ? #temporals.format(project.createdOn, 'dd MMM yyyy') : 'N/A'}">
+                                16 Nov 2025
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon-small purple">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">DUE DATE</div>
+                            <div class="info-value"
+                                 th:text="${project.dueDate != null ? #temporals.format(project.dueDate, 'dd MMM yyyy') : 'N/A'}">
+                                16 Nov 2025
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon-small purple">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">CREATED BY</div>
+                            <div class="info-value"
+                                 th:text="${project.user != null ? project.user.firstName + ' ' + project.user.lastName : 'N/A'}">
+                                Maxi Stefanov
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon-small purple">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">TOTAL TASKS</div>
+                            <div class="info-value" th:text="${project.tasks != null ? project.tasks.size() : 0}">
+                                0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon-small purple">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">MEMBERS</div>
+                            <div class="info-value">
+                                    <span th:if="${project.members == null or project.members.isEmpty()}"
+                                          class="no-members">No members</span>
+                                <span th:unless="${project.members == null or project.members.isEmpty()}"
+                                      th:text="${members}" class="no-members">No members</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="project-grid">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <div class="info-icon purple">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <h3>Information</h3>
-                    </div>
-                    <div class="info-list">
-                        <div class="info-row">
-                            <div class="info-icon-small purple">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <div class="info-content">
-                                <div class="info-label">CREATION DATE</div>
-                                <div class="info-value"
-                                     th:text="${project.createdOn != null ? #temporals.format(project.createdOn, 'dd MMM yyyy') : 'N/A'}">
-                                    16 Nov 2025
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-icon-small purple">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="info-content">
-                                <div class="info-label">DUE DATE</div>
-                                <div class="info-value"
-                                     th:text="${project.dueDate != null ? #temporals.format(project.dueDate, 'dd MMM yyyy') : 'N/A'}">
-                                    16 Nov 2025
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-icon-small purple">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="info-content">
-                                <div class="info-label">CREATED BY</div>
-                                <div class="info-value"
-                                     th:text="${project.user != null ? project.user.firstName + ' ' + project.user.lastName : 'N/A'}">
-                                    Maxi Stefanov
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-icon-small purple">
-                                <i class="fas fa-list"></i>
-                            </div>
-                            <div class="info-content">
-                                <div class="info-label">TOTAL TASKS</div>
-                                <div class="info-value" th:text="${project.tasks != null ? project.tasks.size() : 0}">
-                                    0
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-icon-small purple">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="info-content">
-                                <div class="info-label">MEMBERS</div>
-                                <div class="info-value">
-                                    <span th:if="${project.members == null or project.members.isEmpty()}"
-                                          class="no-members">No members</span>
-                                    <span th:unless="${project.members == null or project.members.isEmpty()}"
-                                          th:text="${members}" class="no-members">No members</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="tasks-section-full">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-tasks"></i>
+                        Tasks
+                        <span class="task-count-badge"
+                              th:text="${project.tasks != null ? project.tasks.size() : 0}">0</span>
+                    </h2>
 
-                <div class="tasks-section-full">
-                    <div class="section-header">
-                        <h2>
-                            <i class="fas fa-tasks"></i>
-                            Tasks
-                            <span class="task-count-badge"
-                                  th:text="${project.tasks != null ? project.tasks.size() : 0}">0</span>
-                        </h2>
+                    <div th:if="${project.getUser().username.equals(user.username)}">
                         <a th:href="@{'/tasks/new-task/' + ${project.id}}" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             Add Task
                         </a>
                     </div>
+                </div>
 
-                    <div th:if="${tasks != null and !tasks.isEmpty()}" class="tasks-list">
-                        <div th:each="task : ${tasks}">
-                            <div th:if="${task.status.name() != 'COMPLETED'}" class="task-row">
-                                <div class="task-left">
+                <div th:if="${tasks != null and !tasks.isEmpty()}" class="tasks-list">
+                    <div th:each="task : ${tasks}">
+                        <div th:if="${task.status.name() != 'COMPLETED'}" class="task-row" th:classappend="${!project.getUser().username.equals(user.username)} ? 'read-only'">
+                            <div class="task-left">
+                                <div th:if="${project.getUser().username.equals(user.username)}">
                                     <form th:action="@{/tasks/{id}/status(id=${task.id})}" method="post">
                                         <input type="hidden" name="_method" value="patch"/>
                                         <input type="hidden" name="status"
@@ -257,38 +289,45 @@
                                                    onchange="this.form.submit()">
                                         </label>
                                     </form>
-                                    <div class="task-content">
-                                        <h3 th:text="${task.getTitle()}" class="task-name">Design homepage mockup</h3>
-                                        <p th:text="${task.getDescription()}" class="task-desc">
-                                            Create an initial layout for the homepage design based on the wireframe.
-                                        </p>
-                                        <div class="task-info">
+                                </div>
+                                <div th:unless="${project.getUser().username.equals(user.username)}">
+                                    <input type="checkbox" class="task-check" 
+                                           th:checked="${task.status.name() == 'IN_PROGRESS'}"
+                                           disabled style="cursor: default; opacity: 0.6;">
+                                </div>
+                                <div class="task-content">
+                                    <h3 th:text="${task.getTitle()}" class="task-name">Design homepage mockup</h3>
+                                    <p th:text="${task.getDescription()}" class="task-desc">
+                                        Create an initial layout for the homepage design based on the wireframe.
+                                    </p>
+                                    <div class="task-info">
                                             <span th:if="${task.priority.name() == 'LOW'}"
                                                   th:text="${task.priority.getDisplayName()} + ' Priority'"
                                                   class="task-badge low">LOW PRIORITY</span>
-                                            <span th:if="${task.priority.name() == 'MEDIUM'}"
-                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
-                                                  class="task-badge medium">MEDIUM PRIORITY</span>
-                                            <span th:if="${task.priority.name() == 'HIGH'}"
-                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
-                                                  class="task-badge high">HIGH PRIORITY</span>
-                                            <span th:if="${task.status.name() == 'OVERDUE'}" th:text="'Overdue'"
-                                                  class="task-status overdue">Overdue</span>
-                                            <span th:if="${task.status.name() == 'TODO'}" th:text="'TODO'"
-                                                  class="task-status todo">TODO</span>
-                                            <span th:if="${task.status.name() == 'IN_PROGRESS'}" th:text="'In progress'"
-                                                  class="task-status progress">In progress</span>
-                                            <span th:if="${task.dueDate != null}"
-                                                  th:text="${#temporals.format(task.getDueDate(), 'yyyy-MM-dd HH:mm')}"
-                                                  class="task-date">2025-10-20</span>
-                                        </div>
+                                        <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge medium">MEDIUM PRIORITY</span>
+                                        <span th:if="${task.priority.name() == 'HIGH'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge high">HIGH PRIORITY</span>
+                                        <span th:if="${task.status.name() == 'OVERDUE'}" th:text="'Overdue'"
+                                              class="task-status overdue">Overdue</span>
+                                        <span th:if="${task.status.name() == 'TODO'}" th:text="'TODO'"
+                                              class="task-status todo">TODO</span>
+                                        <span th:if="${task.status.name() == 'IN_PROGRESS'}" th:text="'In progress'"
+                                              class="task-status progress">In progress</span>
+                                        <span th:if="${task.dueDate != null}"
+                                              th:text="${#temporals.format(task.getDueDate(), 'yyyy-MM-dd HH:mm')}"
+                                              class="task-date">2025-10-20</span>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="task-actions">
-                                    <a th:href="'/tasks/' + ${task.id} + '/task'">
+                            <div class="task-actions" th:if="${project.getUser().username.equals(user.username)}">
+                                 <a th:href="'/tasks/' + ${task.id} + '/task'">
                                         <button class="btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
                                     </a>
+
                                     <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
                                         <input type="hidden" name="_method" value="delete"/>
                                         <button class="btn-delete" title="Delete">
@@ -300,44 +339,45 @@
                                                 class="fas fa-check-square"></i></button>
                                     </form>
                                 </div>
-                            </div>
+                        </div>
 
-                            <div th:if="${task.status.name() == 'COMPLETED'}" class="task-row completed">
-                                <div class="task-left">
-                                    <input type="checkbox" class="task-check" checked disabled>
-                                    <div class="task-content">
-                                        <h3 th:text="${task.title}" class="task-name">Setup CI/CD pipeline</h3>
-                                        <p th:text="${task.getDescription()}" class="task-desc"></p>
-                                        <div class="task-info">
+                        <div th:if="${task.status.name() == 'COMPLETED'}" class="task-row completed" th:classappend="${!project.getUser().username.equals(user.username)} ? 'read-only'">
+                            <div class="task-left">
+                                <input type="checkbox" class="task-check" checked disabled>
+                                <div class="task-content">
+                                    <h3 th:text="${task.title}" class="task-name">Setup CI/CD pipeline</h3>
+                                    <p th:text="${task.getDescription()}" class="task-desc"></p>
+                                    <div class="task-info">
                                             <span th:if="${task.priority.name() == 'LOW'}"
                                                   th:text="${task.priority.getDisplayName()} + ' Priority'"
                                                   class="task-badge low">Low</span>
-                                            <span th:if="${task.priority.name() == 'MEDIUM'}"
-                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
-                                                  class="task-badge medium">Medium</span>
-                                            <span th:if="${task.priority.name() == 'HIGH'}"
-                                                  th:text="${task.priority.getDisplayName()} + ' Priority'"
-                                                  class="task-badge high">High</span>
-                                            <span class="task-badge done">Completed</span>
-                                            <span th:text="'Completed: ' + ${#temporals.format(task.completedOn, 'yyyy MMM dd HH:MM')}"
-                                                  class="task-date">Completed: Dec 8</span>
-                                        </div>
+                                        <span th:if="${task.priority.name() == 'MEDIUM'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge medium">Medium</span>
+                                        <span th:if="${task.priority.name() == 'HIGH'}"
+                                              th:text="${task.priority.getDisplayName()} + ' Priority'"
+                                              class="task-badge high">High</span>
+                                        <span class="task-badge done">Completed</span>
+                                        <span th:text="'Completed: ' + ${#temporals.format(task.completedOn, 'yyyy MMM dd HH:MM')}"
+                                              class="task-date">Completed: Dec 8</span>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="task-actions">
-                                    <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
-                                        <input type="hidden" name="_method" value="delete"/>
-                                        <button class="btn-delete" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                            <div class="task-actions" th:if="${project.getUser().username.equals(user.username)}">
+                                <form th:action="@{'/tasks/' + ${task.id} + '/task'}" method="post">
+                                    <input type="hidden" name="_method" value="delete"/>
+                                    <button class="btn-delete" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="empty-state" th:if="${project.tasks == null or project.tasks.isEmpty()}">
+                <div class="empty-state" th:if="${project.tasks == null or project.tasks.isEmpty()}">
+                    <th:block th:if="${project.getUser().username.equals(user.username)}">
                         <div class="empty-illustration">
                             <i class="fas fa-tasks"></i>
                         </div>
@@ -347,7 +387,16 @@
                             <i class="fas fa-plus"></i>
                             Add Task
                         </a>
-                    </div>
+                    </th:block>
+
+                    <th:block th:unless="${project.getUser().username.equals(user.username)}">
+                        <div class="empty-illustration">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>No tasks available</h3>
+                        <p>Only the project owner can add tasks.</p>
+                    </th:block>
+
                 </div>
             </div>
         </div>

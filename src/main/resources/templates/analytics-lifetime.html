@@ -209,7 +209,7 @@
                         <div class="metric-icon icon-pink"><i class="fas fa-chart-line"></i></div>
                         <div class="metric-content">
                             <span class="metric-label">Project Completion Rate</span>
-                            <span th:text="${projectAnalytics.projectCompletionRateLifetime} + '%'" class="metric-value">0%</span>
+                            <span th:text="${#numbers.formatDecimal(projectAnalytics.projectCompletionRateLifetime, 0, 0)} + '%'" class="metric-value">0%</span>
                         </div>
                     </div>
                 </div>

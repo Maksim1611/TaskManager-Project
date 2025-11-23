@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Member - TaskFlow</title>
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/add-task.css">
+    <link rel="stylesheet" href="/css/project.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="sidebar-layout">
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">TaskFlow</h1>
+        </div>
+
+        <nav class="nav">
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="/projects" class="nav-link">
+                <i class="fas fa-folder"></i>
+                Projects
+            </a>
+            <a href="/tasks" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </a>
+            <a href="/activity" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                Activity
+            </a>
+            <a href="/analytics" class="nav-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                Analytics
+            </a>
+            <a href="/notifications" class="nav-link">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="nav-link">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/users" class="nav-link">
+                    <i class="fa-solid fa-user"></i>
+                    Users
+                </a>
+            </div>
+        </nav>
+
+        <div class="user-profile">
+            <img th:if="${base64Image != null}"
+                 th:src="'data:image/png;base64,' + ${base64Image}"
+                 class="user-avatar"
+                 alt="User Avatar">
+
+            <div th:if="${base64Image == null}"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}"
+                 class="user-avatar">MS
+            </div>
+
+            <div class="user-info">
+                <div th:text="${user.firstName + ' ' + user.lastName}" class="name"></div>
+                <div th:text="${user.email}" class="email"></div>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">Remove member</h1>
+                <p class="subtitle">Remove a member from this project</p>
+            </div>
+            <div class="header-right">
+                <a th:href="@{'/projects/' + ${id}}" class="back-btn-large">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Project
+                </a>
+            </div>
+        </header>
+
+        <div class="content">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="form-card" style="background: white; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 20px 20px 0 0;"></div>
+                    
+                    <div style="margin-bottom: 2rem; text-align: center;">
+                        <div style="width: 80px; height: 80px; border-radius: 16px; background: linear-gradient(135deg, #ef4444, #dc2626); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);">
+                            <i class="fas fa-user-minus" style="font-size: 2rem; color: white;"></i>
+                        </div>
+                        <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">Remove Team Member</h2>
+                        <p style="color: #6b7280; font-size: 0.9375rem;">Enter the username of the member you want to remove from this project</p>
+                    </div>
+
+                    <form th:action="@{'/projects/' + ${id} + '/member'}" th:method="POST" th:object="${removeMemberRequest}">
+                        <div th:if="${errorMessageMember}" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #dc2626; font-weight: 600; font-size: 0.875rem;">
+                            <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
+                            <span th:text="${errorMessageMember}"></span>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label for="username" class="form-label" style="display: flex; align-items: center; font-weight: 700; color: #374151; margin-bottom: 0.875rem; font-size: 1rem; letter-spacing: -0.025em;">
+                                <i class="fas fa-user" style="margin-right: 0.75rem; color: #ef4444; width: 18px; font-size: 1rem;"></i>
+                                Username
+                            </label>
+                            <input type="text" id="username" name="username" class="form-input" required placeholder="Enter username" style="padding: 1.125rem; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 1rem; transition: all 0.3s ease; background-color: white; font-weight: 400; width: 100%;">
+                            <div th:if="${#fields.hasErrors()}" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem; color: #dc2626; font-weight: 600; font-size: 0.875rem;">
+                                <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
+                                <span th:errors="${removeMemberRequest.username}"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(239, 68, 68, 0.1);">
+                            <a th:href="@{'/projects/' + ${id}}" class="btn btn-secondary" style="text-decoration: none;">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: 2px solid transparent;">
+                                <i class="fas fa-user-minus"></i>
+                                Remove member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
+

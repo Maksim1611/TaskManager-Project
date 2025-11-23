@@ -349,6 +349,29 @@
     cursor: pointer;
 }
 
+.task-row.read-only {
+    cursor: default;
+}
+
+.task-row.read-only:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    cursor: default;
+}
+
+.task-row.read-only form,
+.task-row.read-only button,
+.task-row.read-only a,
+.task-row.read-only .task-check {
+    pointer-events: none;
+    cursor: default;
+}
+
+.task-row.read-only input[type="checkbox"] {
+    pointer-events: none;
+    cursor: default;
+}
+
 .btn-delete {
     pointer-events: auto;
 }
@@ -1049,6 +1072,12 @@
     background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit.gray {
+    background: linear-gradient(135deg, #a3a5a8 0%, #6a6a6b 100%);
+    color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(70, 70, 72, 0.3);
 }
 
 .btn-edit:hover {

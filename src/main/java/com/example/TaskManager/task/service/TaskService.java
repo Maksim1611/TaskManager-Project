@@ -54,10 +54,10 @@ public class TaskService {
 
     @Transactional
     public Task createTask(@Valid CreateTaskRequest createTaskRequest, User user, Project project) {
-        Optional<Task> taskOptional = this.taskRepository.findByTitleAndDeletedFalse(createTaskRequest.getTitle());
+        Optional<Task> taskOptional = taskRepository.findByTitleAndProjectNullAndDeletedFalse(createTaskRequest.getTitle());
 
         if (taskOptional.isPresent()) {
-            throw new RuntimeException("Task with title [%s] already exists".formatted(createTaskRequest.getTitle()));
+            throw new TaskAlreadyExistException("Task with title [%s] already exists".formatted(createTaskRequest.getTitle()));
         }
 
         Task task = Task.builder()
@@ -73,9 +73,7 @@ public class TaskService {
                 .project(project)
                 .build();
 
-        if (taskRepository.findByTitleAndDeletedFalse(task.getTitle()).isPresent()) {
-            throw new TaskAlreadyExistException("Task with title [%s] already exists".formatted(task.getTitle()));
-        }
+
 
         Task save = this.taskRepository.save(task);
 

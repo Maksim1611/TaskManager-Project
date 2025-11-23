@@ -227,4 +227,8 @@ public class UserService implements UserDetailsService {
        return getAllUsers().stream().sorted(Comparator.comparingInt(u ->
                u.getRole() == UserRole.ADMIN ? 0 : u.getRole() == UserRole.MODERATOR ? 1 : 2)).toList();
     }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }

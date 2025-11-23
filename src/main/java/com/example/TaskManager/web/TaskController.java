@@ -10,6 +10,7 @@ import com.example.TaskManager.web.dto.CreateTaskRequest;
 import com.example.TaskManager.web.dto.DtoMapper;
 import com.example.TaskManager.web.dto.EditTaskRequest;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -50,6 +51,7 @@ public class TaskController {
         return mv;
     }
 
+    @PreAuthorize("@projectSecurity.isOwner(#projectId, authentication)")
     @GetMapping("/new-task/{projectId}")
     public ModelAndView getCreateTaskPageForProject(@AuthenticationPrincipal UserData userData, @PathVariable UUID projectId) {
         ModelAndView mv = new ModelAndView("add-task-project");
