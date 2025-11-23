@@ -120,7 +120,7 @@
                                 Username
                             </label>
                             <input type="text" id="username" name="username" class="form-input" required placeholder="Enter username" style="padding: 1.125rem; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 1rem; transition: all 0.3s ease; background-color: white; font-weight: 400; width: 100%;">
-                            <div th:if="${#fields.hasErrors()}" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #dc2626; font-weight: 600; font-size: 0.875rem;">
+                            <div th:if="${#fields.hasErrors()}" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #dc2626; font-weight: 600; font-size: 0.875rem;"></div>
                                 <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
                                 <span th:errors="${inviteMemberRequest.username}"></span>
                         </div>
