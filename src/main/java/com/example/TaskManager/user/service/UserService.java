@@ -162,7 +162,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public User registerViaGoogle(UserCreateDto userCreateDto, Object email) {
+    public User registerViaOauth2(UserCreateDto userCreateDto, Object email, String provider) {
         if (email == null) {
             throw new IllegalStateException("Google email not found in session!");
         }
@@ -176,7 +176,7 @@ public class UserService implements UserDetailsService {
         User user = User.builder()
                 .username(userCreateDto.getUsername())
                 .email(email.toString())
-                .password("OAUTH2_USER")
+                .password(UUID.randomUUID().toString())
                 .createdOn(LocalDateTime.now())
                 .firstName(userCreateDto.getFirstName())
                 .lastName(userCreateDto.getLastName())
@@ -189,7 +189,7 @@ public class UserService implements UserDetailsService {
                 .summaryNotificationEnabled(true)
                 .reminderNotificationEnabled(true)
                 .profileCompleted(true)
-                .provider("Google")
+                .provider(provider)
                 .build();
 
         User save = userRepository.save(user);
