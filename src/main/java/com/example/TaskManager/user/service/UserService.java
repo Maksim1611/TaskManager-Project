@@ -44,10 +44,6 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
-//
-//        if (!user.isActive()) {
-//            throw new UserNotActiveException("Your account has been blocked.");
-//        }
 
         return UserData.builder()
                 .id(user.getId())
@@ -164,7 +160,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User registerViaOauth2(UserCreateDto userCreateDto, Object email, String provider) {
         if (email == null) {
-            throw new IllegalStateException("Google email not found in session!");
+            throw new IllegalStateException(provider + " email not found in session!");
         }
 
         Optional<User> optional = userRepository.findByEmail(email.toString());

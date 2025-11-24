@@ -3,7 +3,6 @@ package com.example.TaskManager.security.oauth;
 import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.repository.UserRepository;
-import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

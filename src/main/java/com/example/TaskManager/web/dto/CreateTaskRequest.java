@@ -1,7 +1,5 @@
 package com.example.TaskManager.web.dto;
 
-import com.example.TaskManager.project.model.Project;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Builder
 @AllArgsConstructor

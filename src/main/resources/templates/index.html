@@ -17,8 +17,6 @@
             <a th:href="@{/}" class="navbar-brand">TaskFlow</a>
             <ul class="navbar-menu">
                 <li><a th:href="@{dashboard}" class="navbar-link active">Home</a></li>
-                <li><a th:href="@{features}" class="navbar-link">Features</a></li>
-                <li><a th:href="@{pricing}" class="navbar-link">Pricing</a></li>
                 <li><a th:href="@{login}" class="navbar-link">Login</a></li>
                 <li><a th:href="@{register}" class="btn btn-primary btn-sm">Get Started</a></li>
             </ul>
@@ -49,9 +47,6 @@
             <div style="display: flex; gap: 1rem; justify-content: center; animation: fadeInUp 0.8s ease-out 0.4s backwards;">
                 <a th:href="@{register}" class="btn btn-lg" style="background: white; color: #667eea; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                     Start Free Trial
-                </a>
-                <a th:href="@{features}" class="btn btn-lg btn-outline" style="border-color: white; color: white;">
-                    Learn More
                 </a>
             </div>
         </div>
@@ -151,10 +146,10 @@
 
             <div class="card" style="text-align: center;">
                 <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
-                    🎨
+                    👥
                 </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Customizable Views</h3>
-                <p style="color: var(--gray);">Choose between Kanban boards, lists, or calendar views. Work your way.</p>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Team Collaboration</h3>
+                <p style="color: var(--gray);">Invite teammates to projects, assign tasks, and communicate effortlessly. Everyone stays in sync.</p>
             </div>
 
             <div class="card" style="text-align: center;">
@@ -168,122 +163,9 @@
     </div>
 </section>
 
-<section style="padding: 100px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: relative; overflow: hidden;">
-
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 1px, transparent 1px), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 50px 50px;"></div>
-
-    <style>
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .stat-card {
-            animation: countUp 0.8s ease-out backwards;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            background: linear-gradient(to bottom, #ffffff, #e0e7ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-    </style>
-
-    <div class="container" style="position: relative; z-index: 1;">
-        <div class="grid grid-cols-4" style="gap: 3rem;">
-
-            <div class="stat-card" style="text-align: center; animation-delay: 0s;">
-                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
-                    👥
-                </div>
-                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">10K+</div>
-                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Active Users</div>
-                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">Growing daily</div>
-            </div>
-
-            <div class="stat-card" style="text-align: center; animation-delay: 0.1s;">
-                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
-                    ✅
-                </div>
-                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">50K+</div>
-                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Tasks Completed</div>
-                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">And counting</div>
-            </div>
-
-            <div class="stat-card" style="text-align: center; animation-delay: 0.2s;">
-                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
-                    ⚡
-                </div>
-                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">99.9%</div>
-                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Uptime</div>
-                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">Always available</div>
-            </div>
-
-            <div class="stat-card" style="text-align: center; animation-delay: 0.3s;">
-                <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 1rem; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid rgba(255,255,255,0.2);">
-                    💬
-                </div>
-                <div class="stat-number" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1;">24/7</div>
-                <div style="font-size: 1.125rem; font-weight: 500; opacity: 0.95; letter-spacing: 0.5px;">Support</div>
-                <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">We're here to help</div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<section style="padding: 80px 0;">
-    <div class="container">
-        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 4rem;">
-            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Ready to Get Started?</h2>
-            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">Join thousands of teams already using TaskFlow</p>
-            <a th:href="@{register}" class="btn btn-lg" style="background: white; color: #667eea;">
-                Start Your Free Trial
-            </a>
-        </div>
-    </div>
-</section>
-
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
-            <div class="footer-section">
-                <h4>TaskFlow</h4>
-                <p>The modern way to manage tasks and collaborate with your team.</p>
-            </div>
-            <div class="footer-section">
-                <h4>Product</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Pricing</a></li>
-                    <li><a href="#">Security</a></li>
-                    <li><a href="#">Roadmap</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Company</h4>
-                <ul class="footer-links">
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Community</a></li>
-                    <li><a href="#">API</a></li>
-                </ul>
-            </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 TaskFlow. All rights reserved.</p>

@@ -2,8 +2,6 @@ package com.example.TaskManager.project.repository;
 
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.project.model.ProjectStatus;
-import com.example.TaskManager.task.model.Task;
-import com.example.TaskManager.task.model.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

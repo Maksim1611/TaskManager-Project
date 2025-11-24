@@ -92,7 +92,9 @@ public class ProjectService {
 
     public List<Project> getRecentProjects(User user) {
 
-        List<Project> projects = projectRepository.findAllByUserIdAndDeletedOrderByDueDateAsc(user.getId(), false);
+        List<Project> projects = projectRepository.findAllByUserIdAndDeletedOrderByDueDateAsc(user.getId(), false)
+                .stream().filter(p -> !p.getStatus().equals(ProjectStatus.OVERDUE) && !p.getStatus().equals(ProjectStatus.COMPLETED)).toList();
+
         List<Project> recentProjects = new ArrayList<>();
 
         if (projects.size() > 2) {

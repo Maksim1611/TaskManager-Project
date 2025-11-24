@@ -1,6 +1,5 @@
 package com.example.TaskManager.web.dto;
 
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;

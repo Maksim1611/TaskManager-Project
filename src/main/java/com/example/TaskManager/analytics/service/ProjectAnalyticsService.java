@@ -2,13 +2,11 @@ package com.example.TaskManager.analytics.service;
 
 import com.example.TaskManager.analytics.client.AnalyticsClient;
 import com.example.TaskManager.analytics.client.dto.ProjectAnalyticsRequest;
-import com.example.TaskManager.analytics.client.dto.ProjectAnalyticsResponse;
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.project.repository.ProjectRepository;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -152,6 +152,7 @@ a:hover {
     gap: var(--spacing-lg);
     list-style: none;
     align-items: center;
+    margin-right: 10rem;
 }
 
 .navbar-link {

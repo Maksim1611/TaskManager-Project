@@ -1,7 +1,6 @@
 package com.example.TaskManager.security;
 
 import com.example.TaskManager.user.model.UserRole;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class UserData implements UserDetails, OAuth2User  {
     private UserRole role;
     private Map<String, Object> attributes;
 
-    public UserData(UUID id, String email, String password, boolean isActive, UserRole role, Map<String, Object> attributes) {
+    public UserData(UUID id, String email, String password, boolean isActive, UserRole role, Map<String, Object> attributes ) {
         this.id = id;
         this.email = email;
         this.password = password;

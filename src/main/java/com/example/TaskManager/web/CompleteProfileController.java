@@ -42,9 +42,11 @@ public class CompleteProfileController {
 
         String email = attributes.get("email").toString();
 
-        User saved = userService.registerViaGoogle(dto, email);
+        String provider = (String) session.getAttribute("oauthProvider");
 
-        UserData principal = new UserData(
+        User saved = userService.registerViaOauth2(dto, email, provider);
+
+        UserData principal =  new UserData(
                 saved.getId(),
                 saved.getEmail(),
                 saved.getPassword(),

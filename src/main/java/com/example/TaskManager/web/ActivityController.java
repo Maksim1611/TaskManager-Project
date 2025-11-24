@@ -34,7 +34,6 @@ public class ActivityController {
         User user = userService.getById(userData.getId());
         List<Activity> activities = activityService.getActivityByTypeAndUserId(user.getId(), null);
 
-        // Calculate counts
         long taskCount = activities.stream()
                 .filter(a -> !a.getType().name().contains("PROJECT"))
                 .count();

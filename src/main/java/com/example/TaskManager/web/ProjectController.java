@@ -2,7 +2,6 @@ package com.example.TaskManager.web;
 
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.project.model.ProjectStatus;
-import com.example.TaskManager.project.security.ProjectSecurity;
 import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.project.service.ProjectService;
 import com.example.TaskManager.task.model.Task;
@@ -11,7 +10,6 @@ import com.example.TaskManager.user.service.UserService;
 import com.example.TaskManager.web.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -28,12 +26,11 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final UserService userService;
-    private final ProjectSecurity projectSecurity;
 
-    public ProjectController(ProjectService projectService, UserService userService, ProjectSecurity projectSecurity) {
+
+    public ProjectController(ProjectService projectService, UserService userService ) {
         this.projectService = projectService;
         this.userService = userService;
-        this.projectSecurity = projectSecurity;
     }
 
     @GetMapping

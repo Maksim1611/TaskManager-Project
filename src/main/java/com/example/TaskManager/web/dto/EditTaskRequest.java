@@ -1,6 +1,5 @@
 package com.example.TaskManager.web.dto;
 
-import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.task.model.TaskPriority;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

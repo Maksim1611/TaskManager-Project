@@ -6,7 +6,6 @@ import com.example.TaskManager.analytics.client.dto.TaskAnalyticsResponse;
 import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

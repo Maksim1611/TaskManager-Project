@@ -1,11 +1,9 @@
 package com.example.TaskManager.web.dto;
 
 import com.example.TaskManager.project.model.Project;
-import com.example.TaskManager.project.service.ProjectService;
 import com.example.TaskManager.task.model.Task;
 import com.example.TaskManager.user.model.User;
 import lombok.experimental.UtilityClass;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @UtilityClass
 public class DtoMapper {

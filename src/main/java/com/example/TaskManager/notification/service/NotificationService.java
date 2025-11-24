@@ -7,8 +7,6 @@ import com.example.TaskManager.notification.client.dto.NotificationResponse;
 import com.example.TaskManager.notification.client.dto.PreferenceResponse;
 import com.example.TaskManager.notification.client.dto.UpsertPreferenceRequest;
 import com.example.TaskManager.user.model.User;
-import com.example.TaskManager.user.repository.UserRepository;
-import com.example.TaskManager.user.service.UserService;
 import com.example.TaskManager.web.dto.EditPreferenceRequest;
 import com.example.TaskManager.web.dto.GlobalNotificationRequest;
 import feign.FeignException;

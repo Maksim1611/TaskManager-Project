@@ -10,11 +10,9 @@ function initFilters() {
         tab.addEventListener('click', function() {
             const filter = this.getAttribute('data-filter');
 
-            // Update active tab
             filterTabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
 
-            // Filter activities
             activityItems.forEach(item => {
                 const type = item.getAttribute('data-type');
 

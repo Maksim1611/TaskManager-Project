@@ -2,7 +2,6 @@ package com.example.TaskManager.web.dto;
 
 import com.example.TaskManager.project.model.ProjectStatus;
 import com.example.TaskManager.project.model.ProjectVisibility;
-import com.example.TaskManager.tag.model.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
