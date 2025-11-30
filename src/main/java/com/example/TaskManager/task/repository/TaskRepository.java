@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,8 +21,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     Optional<Task> findByIdAndDeletedFalse(UUID id);
 
-    Optional<Task> findByTitleAndDeletedFalse(String title);
-
     List<Task> findByDueDateBeforeAndStatusNotAndDeletedFalse(LocalDateTime now, TaskStatus taskStatus);
 
     List<Task> findByStatusNotAndDeletedFalse(TaskStatus taskStatus);
@@ -32,11 +31,13 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     List<Task> findAllByUserIdAndProjectNull(UUID userId);
 
-    List<Task> findAllByUserIdAndProjectNullAndDeletedFalseAndDueDateBetweenAndStatusNot(UUID userId, LocalDateTime startOfWeek, LocalDateTime endOfWeek, TaskStatus taskStatus);
-
     List<Task> findAllByUserIdAndStatusNotAndStatusNotAndDeletedFalseAndProjectNullOrderByDueDateAsc(UUID id, TaskStatus taskStatus, TaskStatus taskStatus1);
 
     List<Task> findAllByUserIdAndDeletedFalseOrderByCreatedOnDesc(UUID id);
 
     Optional<Task> findByTitleAndProjectNullAndDeletedFalse( String title);
+
+    List<Task> findAllByUserIdAndProjectNullAndDeletedFalseAndDueDateBetweenAndStatusNotAndStatusNot(UUID userId, LocalDateTime dueDateAfter, LocalDateTime dueDateBefore, TaskStatus status, TaskStatus status1);
+
+    List<Task> findAllByUserIdAndStatusAndDeletedFalse(UUID userId, TaskStatus taskStatus);
 }

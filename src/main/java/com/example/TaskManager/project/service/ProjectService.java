@@ -17,6 +17,7 @@ import com.example.TaskManager.task.model.TaskStatus;
 import com.example.TaskManager.task.repository.TaskRepository;
 import com.example.TaskManager.task.service.TaskService;
 import com.example.TaskManager.user.model.User;
+import com.example.TaskManager.user.repository.UserRepository;
 import com.example.TaskManager.user.service.UserService;
 import com.example.TaskManager.web.dto.CreateProjectRequest;
 import com.example.TaskManager.web.dto.EditProjectRequest;
@@ -44,8 +45,9 @@ public class ProjectService {
     private final TagRepository tagRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public ProjectService(ProjectRepository projectRepository, TagService tagService, ActivityService activityService, TaskService taskService, ProjectAnalyticsService projectAnalyticsService, TaskRepository taskRepository, TagRepository tagRepository, ApplicationEventPublisher eventPublisher, UserService userService) {
+    public ProjectService(ProjectRepository projectRepository, TagService tagService, ActivityService activityService, TaskService taskService, ProjectAnalyticsService projectAnalyticsService, TaskRepository taskRepository, TagRepository tagRepository, ApplicationEventPublisher eventPublisher, UserService userService, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.tagService = tagService;
         this.activityService = activityService;
@@ -55,6 +57,7 @@ public class ProjectService {
         this.tagRepository = tagRepository;
         this.eventPublisher = eventPublisher;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -188,7 +191,7 @@ public class ProjectService {
         }
     }
 
-    private void processProject(Project project) {
+    public void processProject(Project project) {
         LocalDateTime now = LocalDateTime.now();
 
         if (project.getDueDate().isBefore(now)
@@ -266,11 +269,11 @@ public class ProjectService {
 
     public void inviteMember(InviteMemberRequest inviteMemberRequest, UUID projectId, User user) {
         Project project = getByIdNotDeleted(projectId);
-        User invited = userService.getByUsername(inviteMemberRequest.getUsername());
+        Optional<User> invited = userRepository.findByUsername(inviteMemberRequest.getUsername());
 
         List<User> members = project.getMembers();
 
-        if (invited == null) {
+        if (invited.isEmpty()) {
             throw new MemberNotFoundException("User [%s] does not exist".formatted(inviteMemberRequest.getUsername()));
         }
 
@@ -278,11 +281,11 @@ public class ProjectService {
             throw new MemberAlreadyExistException("You cannot add yourself to a project.");
         }
 
-        if (members.contains(invited)) {
+        if (members.contains(invited.get())) {
             throw new MemberAlreadyExistException("This user is already included in the project.");
         }
 
-        members.add(invited);
+        members.add(invited.get());
         update(project);
     }
 
@@ -294,19 +297,19 @@ public class ProjectService {
 
     public void removeMember(UUID id, User user, @Valid RemoveMemberRequest removeMemberRequest) {
         Project project = getByIdNotDeleted(id);
-        User removed = userService.getByUsername(removeMemberRequest.getUsername());
+        Optional<User> removed = userRepository.findByUsername(removeMemberRequest.getUsername());
 
         List<User> members = project.getMembers();
 
-        if (removed == null) {
+        if (removed.isEmpty()) {
             throw new MemberNotFoundException("User [%s] does not exist".formatted(removeMemberRequest.getUsername()));
-        } else if (!members.contains(removed)) {
+        } else if (!members.contains(removed.get())) {
             throw new MemberNotFoundException("This user is not included in the project.");
-        } else if (user.getUsername().equals(removed.getUsername())) {
+        } else if (user.getUsername().equals(removed.get().getUsername())) {
             throw new MemberNotFoundException("You cannot remove yourself from a project.");
         }
 
-        members.remove(removed);
+        members.remove(removed.get());
         update(project);
     }
 }

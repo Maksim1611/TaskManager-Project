@@ -3,6 +3,7 @@ package com.example.TaskManager.security.oauth;
 import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +46,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if (registrationId.equals("google")) {
             email = oauth.getAttribute("email");
+            attributes.put("provider", "Google");
+
         }
 
         if (registrationId.equals("github")) {
@@ -55,6 +58,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 email = fetchGithubPrimaryEmail(request);
                 attributes.put("email", email);
             }
+            attributes.put("provider", "Github");
         }
 
         Optional<User> existing = userRepository.findByEmail(email);

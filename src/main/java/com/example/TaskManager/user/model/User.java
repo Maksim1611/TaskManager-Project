@@ -20,6 +20,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -36,6 +37,7 @@ public class User {
     private String lastName;
 
     @Column
+    @Size(min = 6)
     private String password;
 
     @Column(nullable = false)

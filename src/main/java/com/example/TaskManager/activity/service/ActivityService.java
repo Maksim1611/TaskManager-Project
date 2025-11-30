@@ -77,11 +77,6 @@ public class ActivityService {
         return list;
     }
 
-    private void update(Activity activity) {
-        activity.setUpdatedOn(LocalDateTime.now());
-        activityRepository.save(activity);
-    }
-
     @Transactional
     public void deleteActivity(UUID id) {
         activityRepository.deleteAllByUserId(id);

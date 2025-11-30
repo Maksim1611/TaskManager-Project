@@ -87,7 +87,9 @@ public class ProjectController {
     @PostMapping("/new-project")
     public ModelAndView createProject(@Valid @ModelAttribute CreateProjectRequest createProjectRequest, BindingResult bindingResult, @AuthenticationPrincipal UserData userData) {
         if (bindingResult.hasErrors()) {
-            return new ModelAndView("add-project");
+            ModelAndView mv = new ModelAndView("add-project");
+            mv.addObject("user", userService.getById(userData.getId()));
+            return mv;
         }
 
         User user = userService.getById(userData.getId());
@@ -120,9 +122,10 @@ public class ProjectController {
             ModelAndView mv = new ModelAndView("edit-project");
             User user = userService.getById(userData.getId());
             mv.addObject("user",user);
+            Project project = projectService.getByIdNotDeleted(id);
+            mv.addObject("editProjectRequest", DtoMapper.fromProject(project, projectService.getProjectTagsAsString(project)));
             return mv;
         }
-
         projectService.editProject(editProjectRequest, id);
         return new ModelAndView("redirect:/projects");
     }
@@ -150,7 +153,7 @@ public class ProjectController {
     }
 
     @PostMapping("/{id}/invitation")
-    public ModelAndView addMemberPage(@AuthenticationPrincipal UserData userData, @PathVariable UUID id,@ModelAttribute InviteMemberRequest inviteMemberRequest, BindingResult bindingResult) {
+    public ModelAndView addMemberPage(@AuthenticationPrincipal UserData userData, @PathVariable UUID id,@Valid @ModelAttribute InviteMemberRequest inviteMemberRequest, BindingResult bindingResult) {
         User user = userService.getById(userData.getId());
 
         if (bindingResult.hasErrors()) {
@@ -176,7 +179,7 @@ public class ProjectController {
     @PreAuthorize("@projectSecurity.isOwner(#id, authentication)")
     @PostMapping("/{id}/member")
     public ModelAndView removeMember(@PathVariable UUID id, @Valid @ModelAttribute RemoveMemberRequest removeMemberRequest,
-                               @AuthenticationPrincipal UserData userData ,BindingResult bindingResult) {
+                                     BindingResult bindingResult, @AuthenticationPrincipal UserData userData) {
         User user = userService.getById(userData.getId());
 
         if (bindingResult.hasErrors()) {

@@ -75,7 +75,7 @@ public class TaskController {
 
         Task task = this.taskService.createTask(createTaskRequest, user, projectService.getByIdNotDeleted(projectId));
 
-        return new ModelAndView(taskService.checkIfTaskHasProjectRedirect(task.getId()));
+        return new ModelAndView("redirect:/projects/" + task.getProject().getId());
     }
 
     @PostMapping("/new-task")
@@ -90,7 +90,7 @@ public class TaskController {
 
         Task task = this.taskService.createTask(createTaskRequest, user, null);
 
-        return new ModelAndView(taskService.checkIfTaskHasProjectRedirect(task.getId()));
+        return new ModelAndView("redirect:/tasks");
     }
 
     @PatchMapping("/{id}/status")

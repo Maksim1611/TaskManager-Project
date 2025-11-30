@@ -5,7 +5,8 @@ import com.example.TaskManager.activity.model.ActivityType;
 import com.example.TaskManager.activity.repository.ActivityRepository;
 import com.example.TaskManager.activity.service.ActivityService;
 import com.example.TaskManager.analytics.service.TaskAnalyticsService;
-import com.example.TaskManager.exception.TaskAlreadyExistException;
+import com.example.TaskManager.exception.task.TaskAlreadyExistException;
+import com.example.TaskManager.exception.task.TaskNotFoundException;
 import com.example.TaskManager.project.model.Project;
 import com.example.TaskManager.task.event.TaskOverdueEvent;
 import com.example.TaskManager.task.event.TaskUpcomingDeadlineEvent;
@@ -43,7 +44,7 @@ public class TaskService {
     private final ApplicationEventPublisher eventPublisher;
     private final ActivityRepository activityRepository;
 
-    public TaskService(TaskRepository taskRepository, UserService userService, ActivityService activityService, TaskAnalyticsService taskAnalyticsService, ApplicationEventPublisher eventPublisher, ActivityRepository activityRepository ) {
+    public TaskService(TaskRepository taskRepository, UserService userService, ActivityService activityService, TaskAnalyticsService taskAnalyticsService, ApplicationEventPublisher eventPublisher, ActivityRepository activityRepository) {
         this.taskRepository = taskRepository;
         this.userService = userService;
         this.activityService = activityService;
@@ -72,7 +73,6 @@ public class TaskService {
                 .deleted(false)
                 .project(project)
                 .build();
-
 
 
         Task save = this.taskRepository.save(task);
@@ -135,8 +135,8 @@ public class TaskService {
         return "redirect:/tasks";
     }
 
-    private Task getById(UUID id) {
-        return this.taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task with id [%s] does not exist".formatted(id.toString())));
+    public Task getById(UUID id) {
+        return this.taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id [%s] does not exist".formatted(id.toString())));
     }
 
     public void deleteTask(UUID id) {
@@ -172,7 +172,7 @@ public class TaskService {
     }
 
     public Task getByIdNotDeleted(UUID id) {
-        return this.taskRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new RuntimeException("Task with id [%s] not found".formatted(id)));
+        return this.taskRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new TaskNotFoundException("Task with id [%s] not found".formatted(id)));
     }
 
     @Scheduled(fixedRate = 60000)
@@ -187,7 +187,7 @@ public class TaskService {
         }
     }
 
-    private void processTask(Task task) {
+    public void processTask(Task task) {
         LocalDateTime now = LocalDateTime.now();
 
         if (task.getDueDate().isBefore(now)
@@ -219,7 +219,7 @@ public class TaskService {
         }
     }
 
-    private void processUpcomingDeadline(Task task) {
+    public void processUpcomingDeadline(Task task) {
         LocalDateTime now = LocalDateTime.now();
         Duration duration;
 
@@ -241,7 +241,9 @@ public class TaskService {
     }
 
     public List<Task> getUpcomingTasks(UUID userId) {
-        List<Task> tasks = getAllTasksByUserIdAndProjectNull(userId);
+        List<Task> tasks = getAllTasksByUserIdAndProjectNull(userId).stream().filter(t -> !t.getStatus().equals(TaskStatus.OVERDUE)
+                && !t.getStatus().equals(TaskStatus.COMPLETED) && t.getDueDate().isAfter(LocalDateTime.now())).toList();
+
         return tasks.stream().sorted(Comparator.comparing(Task::getDueDate)).collect(Collectors.toList());
     }
 
@@ -258,10 +260,10 @@ public class TaskService {
 
         mv.addObject("user", user);
         mv.addObject("tasks", tasks);
-        mv.addObject("countCompletedTasks", getAllTasksByUserIdAndStatusNotDeleted(user.getId(), TaskStatus.COMPLETED).size());
-        mv.addObject("countInProgressTasks", getAllTasksByUserIdAndStatusNotDeleted(user.getId(), TaskStatus.IN_PROGRESS).size());
-        mv.addObject("countTodoTasks", getAllTasksByUserIdAndStatusNotDeleted(user.getId(), TaskStatus.TODO).size());
-        mv.addObject("completedTasksPercentage", calculateByStatusTasksPercentageNonDeleted( TaskStatus.COMPLETED, tasks));
+        mv.addObject("countCompletedTasks", getAllTasksByStatusNotDeleted(tasks, TaskStatus.COMPLETED).size());
+        mv.addObject("countInProgressTasks", getAllTasksByStatusNotDeleted(tasks, TaskStatus.IN_PROGRESS).size());
+        mv.addObject("countTodoTasks", getAllTasksByStatusNotDeleted(tasks, TaskStatus.TODO).size());
+        mv.addObject("completedTasksPercentage", calculateByStatusTasksPercentageNonDeleted(TaskStatus.COMPLETED, tasks));
         mv.addObject("inProgressTasksPercentage", calculateByStatusTasksPercentageNonDeleted(TaskStatus.IN_PROGRESS, tasks));
         mv.addObject("overdueTasksPercentage", calculateByStatusTasksPercentageNonDeleted(TaskStatus.OVERDUE, tasks));
         mv.addObject("recentActivity", recentActivity);
@@ -269,7 +271,11 @@ public class TaskService {
         return mv;
     }
 
-    public List<Task> getAllTasksByUserIdAndStatusNotDeleted(UUID userId ,TaskStatus status) {
+    public List<Task> getAllTasksByStatusNotDeleted(List<Task> tasks, TaskStatus status) {
+        return tasks.stream().filter(t -> t.getStatus().equals(status)).collect(Collectors.toList());
+    }
+
+    public List<Task> getAllTasksByUserIdAndStatusNotDeleted(UUID userId, TaskStatus status) {
         return getAllTasksByUserIdAndProjectNull(userId).stream().filter(t -> t.getStatus().equals(status)).collect(Collectors.toList());
     }
 
@@ -284,7 +290,7 @@ public class TaskService {
     }
 
 
-    private int calculateByStatusTasksPercentageNonDeleted(TaskStatus status, List<Task> tasks) {
+    public int calculateByStatusTasksPercentageNonDeleted(TaskStatus status, List<Task> tasks) {
         int tasksByStatus = Math.toIntExact(tasks.stream().filter(t -> t.getStatus() == status).count());
 
         if (tasksByStatus == 0) {
@@ -359,11 +365,11 @@ public class TaskService {
                 .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
                 .withHour(23).withMinute(59).withSecond(59).withNano(999_000_000);
 
-        return taskRepository.findAllByUserIdAndProjectNullAndDeletedFalseAndDueDateBetweenAndStatusNot(
-                userId, startOfWeek, endOfWeek, TaskStatus.OVERDUE).size();
+        return taskRepository.findAllByUserIdAndProjectNullAndDeletedFalseAndDueDateBetweenAndStatusNotAndStatusNot(
+                userId, startOfWeek, endOfWeek, TaskStatus.OVERDUE, TaskStatus.COMPLETED).size();
     }
 
-    private void createActivityBasedOnProjectStatus(Task task, ActivityType activityType) {
+    public void createActivityBasedOnProjectStatus(Task task, ActivityType activityType) {
 
         if (task.getProject() == null) {
             activityService.createActivity(activityType, userService.getById(task.getUser().getId()), task);

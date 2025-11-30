@@ -24,6 +24,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             OAuth2User oauthUser = (OAuth2User) auth.getPrincipal();
 
             req.getSession().setAttribute("oauthAttributes", oauthUser.getAttributes());
+            req.getSession().setAttribute("provider", oauthUser.getAttribute("provider"));
 
             resp.sendRedirect("/profile-completion");
             return;

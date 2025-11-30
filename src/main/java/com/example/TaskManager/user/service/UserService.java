@@ -64,9 +64,9 @@ public class UserService implements UserDetailsService {
             throw new UsernameAlreadyExistException("Username [%s] already exist.".formatted(registerRequest.getUsername()));
         }
 
-         if (present && userOptional.get().getEmail().equals(registerRequest.getEmail())) {
-             throw new EmailAlreadyExistException("Account with this email already exist.");
-         }
+        if (present && userOptional.get().getEmail().equals(registerRequest.getEmail())) {
+            throw new EmailAlreadyExistException("Account with this email already exist.");
+        }
 
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             throw new RuntimeException("Passwords do not match!");
@@ -88,11 +88,12 @@ public class UserService implements UserDetailsService {
                 .summaryNotificationEnabled(true)
                 .reminderNotificationEnabled(true)
                 .profileCompleted(true)
+                .provider("")
                 .build();
 
         this.userRepository.save(user);
         log.info("New user [%s] profile was successfully registered!".formatted(user.getUsername()));
-        notificationService.upsertPreferences(user.getId(),true, true, true, true, user.getEmail());
+        notificationService.upsertPreferences(user.getId(), true, true, true, true, user.getEmail());
         notificationService.sendNotification(user.getId(), NotificationMessages.USER_REGISTER_SUBJECT,
                 NotificationMessages.USER_REGISTER_BODY.formatted(user.getUsername()), NotificationType.EMAIL);
     }
@@ -112,6 +113,16 @@ public class UserService implements UserDetailsService {
 
     public void updateProfile(UUID id, @Valid EditProfileRequest editProfileRequest) {
         User user = getById(id);
+
+        if (editProfileRequest.getEmail() != null && !editProfileRequest.getEmail().isBlank()) {
+            notificationService.upsertPreferences(id, true, user.isDeadLineNotificationEnabled(),
+                    user.isSummaryNotificationEnabled(), user.isReminderNotificationEnabled(), editProfileRequest.getEmail());
+        } else {
+            notificationService.upsertPreferences(id, false, user.isDeadLineNotificationEnabled(),
+                    user.isSummaryNotificationEnabled(), user.isReminderNotificationEnabled(), editProfileRequest.getEmail());
+        }
+
+
         user.setUsername(editProfileRequest.getUsername());
         user.setFirstName(editProfileRequest.getFirstName());
         user.setLastName(editProfileRequest.getLastName());
@@ -137,13 +148,14 @@ public class UserService implements UserDetailsService {
                 NotificationMessages.PASSWORD_CHANGE_SUBJECT, NotificationType.EMAIL);
     }
 
-    public void deleteUser(User user) {
-        if (userRepository.findById(user.getId()).isPresent()) {
-            userRepository.delete(user);
-        }
+    @Transactional
+    public void deleteUser(UUID id) {
+        User user = getById(id);
 
+        userRepository.delete(user);
         notificationService.sendNotification(user.getId(), NotificationMessages.USER_DELETE_SUBJECT,
                 NotificationMessages.USER_DELETE_BODY.formatted(user.getUsername()), NotificationType.EMAIL);
+
     }
 
     public void editPreferences(@Valid EditPreferenceRequest editPreferenceRequest, UUID id) {
@@ -190,14 +202,15 @@ public class UserService implements UserDetailsService {
 
         User save = userRepository.save(user);
         log.info("New user [%s] profile was successfully registered!".formatted(user.getUsername()));
-        notificationService.upsertPreferences(user.getId(),true, true, true, true, user.getEmail());
+        notificationService.upsertPreferences(user.getId(), true, true, true, true, user.getEmail());
         notificationService.sendNotification(user.getId(), NotificationMessages.USER_REGISTER_SUBJECT,
                 NotificationMessages.USER_REGISTER_BODY.formatted(user.getUsername()), NotificationType.EMAIL);
 
         return save;
     }
 
-    public void changeRole(User user) {
+    public void changeRole(UUID userId) {
+        User user = getById(userId);
         UserRole role = user.getRole();
 
         if (role == UserRole.USER) {
@@ -211,7 +224,8 @@ public class UserService implements UserDetailsService {
         update(user);
     }
 
-    public void blockAccount(User user) {
+    public void blockAccount(UUID userId) {
+        User user = getById(userId);
         boolean active = user.isActive();
 
         user.setActive(!active);
@@ -220,11 +234,11 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getSortedUsers() {
-       return getAllUsers().stream().sorted(Comparator.comparingInt(u ->
-               u.getRole() == UserRole.ADMIN ? 0 : u.getRole() == UserRole.MODERATOR ? 1 : 2)).toList();
+        return getAllUsers().stream().sorted(Comparator.comparingInt(u ->
+                u.getRole() == UserRole.ADMIN ? 0 : u.getRole() == UserRole.MODERATOR ? 1 : 2)).toList();
     }
 
     public User getByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 }

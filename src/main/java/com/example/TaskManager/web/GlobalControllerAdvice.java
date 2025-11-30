@@ -1,13 +1,14 @@
 package com.example.TaskManager.web;
 
 import com.example.TaskManager.exception.MemberAlreadyExistException;
-import com.example.TaskManager.exception.TaskAlreadyExistException;
+import com.example.TaskManager.exception.task.TaskAlreadyExistException;
 import com.example.TaskManager.exception.user.EmailAlreadyExistException;
 import com.example.TaskManager.exception.user.MemberNotFoundException;
 import com.example.TaskManager.exception.user.UserNotFoundException;
 import com.example.TaskManager.exception.user.UsernameAlreadyExistException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,17 +23,22 @@ public class GlobalControllerAdvice {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
-    public ModelAndView handleException() {
-        return new ModelAndView("not-found");
+    public String handleException() {
+        return "not-found";
     }
 
-    @ExceptionHandler({NoResourceFoundException.class,
-            AccessDeniedException.class
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({
+            NoResourceFoundException.class,
+            AccessDeniedException.class,
+            AuthorizationDeniedException.class
     })
     public ModelAndView handleSpringException() {
+
         return new ModelAndView("not-found");
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ModelAndView handleLeftoverException() {
         return new ModelAndView("internal-server-error");

@@ -64,6 +64,7 @@ public class NotificationController {
         return "redirect:/notifications";
     }
 
+    @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     @GetMapping("/sender")
     public ModelAndView getNotificationSenderPage(@AuthenticationPrincipal UserData userData) {
         ModelAndView modelAndView = new ModelAndView("notification-sender");
@@ -77,11 +78,12 @@ public class NotificationController {
     @PreAuthorize("hasAnyRole('MODERATOR','ADMIN')")
     @PostMapping("/sender")
     public ModelAndView sendGlobalNotification(@Valid @ModelAttribute GlobalNotificationRequest globalNotificationRequest,
-                                               @AuthenticationPrincipal UserData userData, BindingResult result) {
+                                               BindingResult result, @AuthenticationPrincipal UserData userData) {
         if (result.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("notification-sender");
             User user = userService.getById(userData.getId());
             modelAndView.addObject("user", user);
+            modelAndView.addObject("notificationRequest", new GlobalNotificationRequest());
             return modelAndView;
         }
 

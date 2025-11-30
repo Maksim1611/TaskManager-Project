@@ -57,6 +57,7 @@ public class UsersController {
             User user = userService.getById(id);
             ModelAndView modelAndView = new ModelAndView("settings");
             modelAndView.addObject("user", user);
+            modelAndView.addObject("changePasswordRequest", new ChangePasswordRequest());
             return modelAndView;
         }
 
@@ -98,6 +99,8 @@ public class UsersController {
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("settings");
             modelAndView.addObject("user", user);
+            modelAndView.addObject("changePasswordRequest", changePasswordRequest);
+            modelAndView.addObject("editProfileRequest", DtoMapper.fromUser(user));
             return modelAndView;
         }
 
@@ -108,23 +111,27 @@ public class UsersController {
     @DeleteMapping("/{id}/user")
     public String deleteUser(@PathVariable UUID id, HttpSession session) {
         User user = userService.getById(id);
-        userService.deleteUser(user);
+        userService.deleteUser(id);
         session.invalidate();
 
-        return "redirect:/users";
+        return "redirect:/logout";
     }
+
 
     @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
     public String changeRole(@PathVariable UUID id ) {
         User user = userService.getById(id);
-        userService.changeRole(user);
+        userService.changeRole(user.getId());
         return "redirect:/users";
     }
 
+
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public String blockUserAccount(@PathVariable UUID id) {
         User user = userService.getById(id);
-        userService.blockAccount(user);
+        userService.blockAccount(id);
         return "redirect:/users";
     }
 

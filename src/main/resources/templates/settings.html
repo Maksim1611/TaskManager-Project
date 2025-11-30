@@ -173,8 +173,8 @@
                     <p class="section-desc">Update your password to keep your account secure</p>
                 </div>
 
-                <div class="settings-card" th:classappend="${user.password == null or user.password.isEmpty()} ? 'google-user-card'">
-                    <div th:if="${user.password == null or user.password == 'OAUTH2_USER'}" class="google-user-message">
+                <div class="settings-card" th:classappend="${user.provider != null} ? 'google-user-card'">
+                    <div th:if="${user.provider.equals('Google')}" class="google-user-message">
                         <div class="google-icon">
                             <i class="fab fa-google"></i>
                         </div>
@@ -182,7 +182,15 @@
                         <p>Your account is managed through Google. To change your password, please update it in your Google account settings.</p>
                     </div>
 
-                    <form th:if="${user.password != null and user.password != 'OAUTH2_USER'}"
+                    <div th:if="${user.provider.equals('Github')}" class="google-user-message">
+                        <div class="google-icon">
+                            <i class="fab fa-google"></i>
+                        </div>
+                        <h3>GitHub users cannot change passwords</h3>
+                        <p>Your account is managed through GitHub. To change your password, please update it in your GitHub account settings.</p>
+                    </div>
+
+                    <form th:if="${user.provider.isEmpty()}"
                           th:action="@{'/users/' + ${user.getId()} + '/password'}" th:method="PUT"
                           th:object="${changePasswordRequest}">
                         <div class="form-grid">
@@ -221,7 +229,7 @@
 
                 <div class="settings-card danger-card">
 
-                    <form th:action="@{'/users/' + ${user.getId()} + '/profile'}" th:method="DELETE">
+                    <form th:action="@{'/users/' + ${user.getId()} + '/user'}" th:method="DELETE">
                         <div class="danger-item">
                             <div class="danger-info">
                                 <h3>Delete Account</h3>
