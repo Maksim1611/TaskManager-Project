@@ -73,7 +73,7 @@ public class TaskController {
             return modelAndView;
         }
 
-        Task task = this.taskService.createTask(createTaskRequest, user, projectService.getByIdNotDeleted(projectId));
+        Task task = this.taskService.createTask(createTaskRequest, user.getId(), projectService.getByIdNotDeleted(projectId));
 
         return new ModelAndView("redirect:/projects/" + task.getProject().getId());
     }
@@ -88,7 +88,7 @@ public class TaskController {
             return modelAndView;
         }
 
-        Task task = this.taskService.createTask(createTaskRequest, user, null);
+        Task task = this.taskService.createTask(createTaskRequest, user.getId(), null);
 
         return new ModelAndView("redirect:/tasks");
     }
@@ -136,7 +136,9 @@ public class TaskController {
         }
 
         taskService.editTask(id, editTaskRequest);
-        return new ModelAndView(taskService.checkIfTaskHasProjectRedirect(id));
+        String redirect = taskService.checkIfTaskHasProjectRedirect(id);
+
+        return new ModelAndView(redirect);
     }
 
 }

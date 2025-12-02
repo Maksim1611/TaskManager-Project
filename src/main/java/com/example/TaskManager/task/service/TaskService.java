@@ -54,12 +54,14 @@ public class TaskService {
     }
 
     @Transactional
-    public Task createTask(@Valid CreateTaskRequest createTaskRequest, User user, Project project) {
+    public Task createTask(@Valid CreateTaskRequest createTaskRequest, UUID userId, Project project) {
         Optional<Task> taskOptional = taskRepository.findByTitleAndProjectNullAndDeletedFalse(createTaskRequest.getTitle());
 
         if (taskOptional.isPresent()) {
             throw new TaskAlreadyExistException("Task with title [%s] already exists".formatted(createTaskRequest.getTitle()));
         }
+
+        User user = userService.getById(userId);
 
         Task task = Task.builder()
                 .title(createTaskRequest.getTitle())
@@ -79,7 +81,7 @@ public class TaskService {
 
         if (task.getProject() == null) {
             createActivityBasedOnProjectStatus(task, ActivityType.TASK_CREATED);
-            taskAnalyticsService.upsertTasks(task.getUser().getId());
+            taskAnalyticsService.upsertTasks(user.getId());
         } else {
             createActivityBasedOnProjectStatus(task, ActivityType.PROJECT_TASK_CREATED);
         }

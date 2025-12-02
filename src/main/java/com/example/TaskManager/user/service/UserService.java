@@ -99,7 +99,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User getById(UUID userId) {
-        return this.userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: [%s] does not exist".formatted(userId.toString())));
+        return this.userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("User with id: [%s] does not exist".formatted(userId.toString())));
     }
 
     public void update(User user) {
@@ -240,5 +241,9 @@ public class UserService implements UserDetailsService {
 
     public User getByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+    }
+
+    public User getManagedUser(UUID userId) {
+        return userRepository.getReferenceById(userId);
     }
 }

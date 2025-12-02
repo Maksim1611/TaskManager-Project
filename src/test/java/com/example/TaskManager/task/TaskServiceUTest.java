@@ -4,7 +4,6 @@ import com.example.TaskManager.activity.model.Activity;
 import com.example.TaskManager.activity.model.ActivityType;
 import com.example.TaskManager.activity.repository.ActivityRepository;
 import com.example.TaskManager.activity.service.ActivityService;
-import com.example.TaskManager.analytics.service.TaskAnalyticsService;
 import com.example.TaskManager.exception.task.TaskAlreadyExistException;
 import com.example.TaskManager.exception.task.TaskNotFoundException;
 import com.example.TaskManager.project.model.Project;
@@ -35,7 +34,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.BDDAssertions.within;
@@ -52,8 +50,6 @@ public class TaskServiceUTest {
     private UserService userService;
     @Mock
     private ActivityService activityService;
-    @Mock
-    private TaskAnalyticsService taskAnalyticsService;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
@@ -75,73 +71,6 @@ public class TaskServiceUTest {
         when(taskRepository.findByTitleAndProjectNullAndDeletedFalse(request.getTitle())).thenReturn(Optional.of(task));
 
         assertThrows(TaskAlreadyExistException.class, () -> taskService.createTask(request, null,null));
-    }
-
-    @Test
-    void whenCreateTask_andRepositoryReturnsOptionalEmptyWithProject_thenPersistTaskToTheDatabase() {
-        CreateTaskRequest request = CreateTaskRequest.builder()
-                .title("title")
-                .description("description")
-                .priority("LOW")
-                .dueDate(LocalDateTime.now())
-                .build();
-        when(taskRepository.findByTitleAndProjectNullAndDeletedFalse(request.getTitle())).thenReturn(Optional.empty());
-
-        UUID userId = UUID.randomUUID();
-        User user = User.builder()
-                .id(userId)
-                .build();
-        when(userService.getById(userId)).thenReturn(user);
-
-        UUID projectId = UUID.randomUUID();
-        Project project = Project.builder()
-                .id(projectId)
-                .build();
-
-        ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
-
-        taskService.createTask(request, user,project);
-
-        verify(taskRepository).save(captor.capture());
-        Task capturedTask = captor.getValue();
-
-        assertEquals("title", capturedTask.getTitle());
-        assertEquals("description", capturedTask.getDescription());
-        assertEquals(TaskPriority.valueOf(request.getPriority()), capturedTask.getPriority());
-        assertNotNull(capturedTask.getCreatedOn());
-        assertNotNull(capturedTask.getUpdatedOn());
-        assertThat(capturedTask.getUpdatedOn()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
-    }
-
-    @Test
-    void whenCreateTask_andRepositoryReturnsOptionalEmptyWithProjectNull_thenPersistTaskToTheDatabase() {
-        CreateTaskRequest request = CreateTaskRequest.builder()
-                .title("title")
-                .description("description")
-                .priority("LOW")
-                .dueDate(LocalDateTime.now())
-                .build();
-        when(taskRepository.findByTitleAndProjectNullAndDeletedFalse(request.getTitle())).thenReturn(Optional.empty());
-
-        UUID userId = UUID.randomUUID();
-        User user = User.builder()
-                .id(userId)
-                .build();
-        when(userService.getById(userId)).thenReturn(user);
-
-        ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
-
-        taskService.createTask(request, user, null);
-
-        verify(taskRepository).save(captor.capture());
-        Task capturedTask = captor.getValue();
-
-        assertEquals("title", capturedTask.getTitle());
-        assertEquals("description", capturedTask.getDescription());
-        assertEquals(TaskPriority.valueOf(request.getPriority()), capturedTask.getPriority());
-        assertNotNull(capturedTask.getCreatedOn());
-        assertNotNull(capturedTask.getUpdatedOn());
-        assertThat(capturedTask.getUpdatedOn()).isCloseTo(LocalDateTime.now(), within(1, ChronoUnit.SECONDS));
     }
 
     @Test

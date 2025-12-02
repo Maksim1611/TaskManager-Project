@@ -110,7 +110,6 @@ public class UsersController {
 
     @DeleteMapping("/{id}/user")
     public String deleteUser(@PathVariable UUID id, HttpSession session) {
-        User user = userService.getById(id);
         userService.deleteUser(id);
         session.invalidate();
 

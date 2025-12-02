@@ -207,90 +207,6 @@
                 </div>
             </section>
 
-            <section class="projects-table-section">
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Projects Overview</h3>
-                        <p class="table-subtitle">All projects with their progress and status</p>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="projects-table">
-                            <thead>
-                            <tr>
-                                <th>Project Name</th>
-                                <th>Progress</th>
-                                <th>Tasks</th>
-                                <th>Status</th>
-                                <th>Visibility</th>
-                                <th>Creation Date</th>
-                                <th>Deadline</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="project : ${user.projects}">
-                                <td th:text="${project.title}" class="project-name">Website Redesign</td>
-                                <td>
-                                    <div class="progress-cell">
-                                        <div class="progress-bar-wrapper">
-                                            <div class="progress-bar-fill" style="width: 75%;" data-value="75"></div>
-                                        </div>
-                                        <span th:text="${project.completionPercent} + '%'" class="progress-text">75%</span>
-                                    </div>
-                                </td>
-                                <td th:text="${project.tasks.size()}" class="task-count">14</td>
-                                <td>
-                                    <span th:text="${project.status.name()}" class="status-badge status-active">Active</span>
-                                </td>
-                                <td class="project-visibility-cell">
-                                    <span th:if="${project.projectVisibility.name() == 'PRIVATE'}" th:text="${project.projectVisibility.getDisplayName()}" class="project-visibility private"></span>
-                                    <span th:if="${project.projectVisibility.name() == 'PUBLIC'}" th:text="${project.projectVisibility.getDisplayName()}" class="project-visibility public"></span>
-                                </td>
-                                <td class="creation-date">
-                                    <i class="far fa-calendar-plus"></i>
-                                    <span th:text="${#temporals.format(project.createdOn, 'dd MMM yyyy')}">15 Nov 2024</span>
-                                </td>
-                                <td class="deadline-cell">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span th:text="${#temporals.format(project.dueDate, 'dd MMM yyy HH:mm')}">Dec 15, 2024</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section class="insights-section">
-                <div class="insights-card">
-                    <div class="insights-header">
-                        <h3><i class="fas fa-lightbulb"></i> Insights & Warnings</h3>
-                    </div>
-                    <div class="insights-list" id="insightsList">
-                        <div class="insight-item insight-warning">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <div>
-                                <strong>Overdue Tasks Alert</strong>
-                                <p>You have 8 overdue task(s) that need immediate attention.</p>
-                            </div>
-                        </div>
-                        <div class="insight-item insight-info">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <strong>Low Completion Rate</strong>
-                                <p>Your completion rate is 43%. Consider focusing on completing existing tasks before starting new ones.</p>
-                            </div>
-                        </div>
-                        <div class="insight-item insight-warning">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <strong>Extended Completion Time</strong>
-                                <p>Average task completion time is 2.4 days. Consider breaking down larger tasks into smaller ones.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
         </div>
     </div>
 </main>
@@ -429,7 +345,6 @@
         }]
     });
 
-    // Tasks by Priority Chart
     const priorityCtx = document.getElementById('priorityChart').getContext('2d');
     new Chart(priorityCtx, {
         type: 'bar',

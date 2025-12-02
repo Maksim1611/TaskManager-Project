@@ -4,10 +4,14 @@ import com.example.TaskManager.security.UserData;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.model.UserRole;
 import lombok.experimental.UtilityClass;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @UtilityClass
@@ -34,5 +38,12 @@ public class UserUtils {
                 .reminderNotificationEnabled(true)
                 .provider("")
                 .build();
+    }
+
+    public Authentication generateAuthentication(User user, UserRole role) {
+        return new UsernamePasswordAuthenticationToken(
+                new UserData(user.getId(), user.getEmail(), user.getPassword(), true, role, null),
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_" + role.name())));
     }
 }

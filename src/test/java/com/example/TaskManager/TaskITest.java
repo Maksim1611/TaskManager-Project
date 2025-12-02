@@ -61,7 +61,7 @@ public class TaskITest {
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build();
 
-        Task task = taskService.createTask(request, user, null);
+        Task task = taskService.createTask(request, user.getId(), null);
 
         Activity activity = activityService.getByUserId(user.getId()).get(0);
 
@@ -87,7 +87,7 @@ public class TaskITest {
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .build();
 
-        Task task = taskService.createTask(request, user, generateProject(user));
+        Task task = taskService.createTask(request, user.getId(), generateProject(user));
 
         Activity activity = activityService.getByUserId(user.getId()).get(0);
 
