@@ -243,7 +243,4 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 
-    public User getManagedUser(UUID userId) {
-        return userRepository.getReferenceById(userId);
-    }
 }

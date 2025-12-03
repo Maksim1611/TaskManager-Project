@@ -1,4 +1,4 @@
-package com.example.TaskManager.security.oauth;
+package com.example.TaskManager.exception.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

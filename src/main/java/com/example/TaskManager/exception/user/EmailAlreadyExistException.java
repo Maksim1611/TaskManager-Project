@@ -5,6 +5,5 @@ public class EmailAlreadyExistException extends RuntimeException {
         super(message);
     }
 
-    public EmailAlreadyExistException() {
-    }
+
 }

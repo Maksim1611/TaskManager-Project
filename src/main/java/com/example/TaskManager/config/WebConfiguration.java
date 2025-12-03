@@ -2,7 +2,7 @@ package com.example.TaskManager.config;
 
 import com.example.TaskManager.exception.handler.CustomAuthFailureHandler;
 import com.example.TaskManager.security.OAuth2SuccessHandler;
-import com.example.TaskManager.security.oauth.CustomOAuth2FailureHandler;
+import com.example.TaskManager.exception.handler.CustomOAuth2FailureHandler;
 import com.example.TaskManager.security.oauth.CustomOAuth2UserService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

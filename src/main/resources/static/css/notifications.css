@@ -650,6 +650,14 @@
     letter-spacing: 0.05em;
 }
 
+.form-label-for-email {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #717373;
+    letter-spacing: 0.05em;
+    font-style: italic;
+}
+
 .notification-type-buttons {
     display: flex;
     gap: 1rem;

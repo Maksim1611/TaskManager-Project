@@ -154,7 +154,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="body" class="form-label">Body</label>
+                        <label for="body" class="form-label">Body   </label>
                         <textarea th:field="*{body}"
                                   th:value="${notificationRequest.body}"
                                   id="body"
@@ -164,6 +164,7 @@
                                   placeholder="Enter notification message"
                                   ></textarea>
                     </div>
+                    <label class="form-label-for-email">#Body is used only for emails!</label>
 
                     <div class="form-actions">
                         <button type="submit" class="btn-send">

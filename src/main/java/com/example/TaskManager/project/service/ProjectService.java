@@ -263,6 +263,7 @@ public class ProjectService {
         if (project.getStatus() != ProjectStatus.COMPLETED) {
             project.setStatus(ProjectStatus.COMPLETED);
             update(project);
+            activityService.createActivity(ActivityType.PROJECT_COMPLETED, userService.getById(project.getUser().getId()), project);
         }
 
     }
