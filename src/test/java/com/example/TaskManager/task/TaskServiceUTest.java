@@ -4,6 +4,7 @@ import com.example.TaskManager.activity.model.Activity;
 import com.example.TaskManager.activity.model.ActivityType;
 import com.example.TaskManager.activity.repository.ActivityRepository;
 import com.example.TaskManager.activity.service.ActivityService;
+import com.example.TaskManager.analytics.service.TaskAnalyticsService;
 import com.example.TaskManager.exception.task.TaskAlreadyExistException;
 import com.example.TaskManager.exception.task.TaskNotFoundException;
 import com.example.TaskManager.project.model.Project;
@@ -16,6 +17,7 @@ import com.example.TaskManager.task.repository.TaskRepository;
 import com.example.TaskManager.task.service.TaskService;
 import com.example.TaskManager.user.model.User;
 import com.example.TaskManager.user.service.UserService;
+import com.example.TaskManager.utils.UserUtils;
 import com.example.TaskManager.web.dto.CreateTaskRequest;
 import com.example.TaskManager.web.dto.EditTaskRequest;
 import org.junit.jupiter.api.Test;
@@ -54,6 +56,8 @@ public class TaskServiceUTest {
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private ActivityRepository activityRepository;
+    @Mock
+    private TaskAnalyticsService taskAnalyticsService;
 
     @InjectMocks
     private TaskService taskService;
@@ -174,7 +178,7 @@ public class TaskServiceUTest {
         UUID userId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
 
-        User user = User.builder().id(userId).build();
+        User user = UserUtils.randomUser();
         Project project = Project.builder().id(projectId).build();
 
         Task task = Task.builder()
@@ -183,6 +187,7 @@ public class TaskServiceUTest {
                 .user(user)
                 .build();
         when(taskRepository.findByIdAndDeletedFalse(taskId)).thenReturn(Optional.of(task));
+        when(userService.getById(user.getId())).thenReturn(user);
 
         taskService.deleteTask(taskId);
 
